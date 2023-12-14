@@ -25,9 +25,11 @@ export default function RootLayout({
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <Header />
-        {children}
+        <div style={{ flex: 1, overflowY: 'hidden' }}>
+          {children}
+        </div>
       </div>
     </ThemeProvider>
   );
