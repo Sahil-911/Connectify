@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Home, Inbox, Mail, Settings } from '@mui/icons-material';
