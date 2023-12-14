@@ -100,7 +100,9 @@ function Chats() {
               maxWidth: '90%',
             }}>
               <Typography variant="body1">{message.text}</Typography>
-              <Typography variant="caption" sx={{ color: 'lightgray', textAlign: 'right' }}>{new Date(message.timestamp).toLocaleString()}</Typography>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Typography variant="caption" sx={{ color: 'lightgray', textAlign: 'right', fontStyle: 'italic' }}>{new Date(message.timestamp).toLocaleString()}</Typography>
+              </div>
             </div>
           </div>
         ))}
@@ -116,7 +118,7 @@ function Chats() {
         }}>
           <div style={{ width: '98%', marginBottom: '0px', display: 'flex' }}>
             {/* Emoji icon */}
-            <IconButton sx={{ color: 'white', backgroundColor: '#333', borderRadius: '4px 0 0 4px', marginTop: '8px',  height: '38px', mt: 1.14 }}>
+            <IconButton sx={{ color: 'white', backgroundColor: '#333', borderRadius: '4px 0 0 4px', marginTop: '8px', height: '38px', mt: 1.14 }}>
               <EmojiEmotionsIcon fontSize='small' />
             </IconButton>
             <TextField
