@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import Header from '../components/header';
+// import Header from '@/components/header';
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -11,7 +11,7 @@ const theme = createTheme({
       main: '#1f1f1f',
     },
     secondary: {
-      main: '#1f1f1f',
+      main: '#ffffff',
     },
   },
   // Other theme configurations...
@@ -26,8 +26,8 @@ export default function RootLayout({
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Header />
-        <div style={{ flex: 1, overflowY: 'hidden' }}>
+        {/* <Header /> */}
+        <div style={{ flex: 1 }}>
           {children}
         </div>
       </div>
