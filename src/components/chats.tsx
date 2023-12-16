@@ -75,11 +75,12 @@ function Chats() {
       flexDirection: 'column',
       justifyContent: 'space-between',
       width: '100%',
-      height: '100%'
+      height: '100%',
+
     }}>
       <Typography variant="h5" sx={{ my: 2, ml: 1.5, color: 'white' }}>Chats</Typography>
       <Divider />
-      <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%' }}>
+      <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
         {messages.map((message) => (
           <div
             key={message.id}
