@@ -1,5 +1,5 @@
 import { UserInput } from '@/types/User.interface';
-import mongoose, { Schema, Model, model } from 'mongoose';
+import { Schema, Model, model } from 'mongoose';
 
 const userSchema = new Schema<UserInput>({
     email: {

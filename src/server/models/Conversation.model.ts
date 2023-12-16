@@ -1,7 +1,5 @@
-import { Conversation, ConversationDocument } from '@/types/Conversation.interface';
-import mongoose, { Schema, Model, Document } from 'mongoose';
-import { User } from '@/types/User.interface';
-import { Message } from '@/types/Message.interface';
+import { Conversation } from '@/types/Conversation.interface';
+import { Schema, model } from 'mongoose';
 
 const conversationSchema = new Schema<Conversation>({
     conversationId: {
@@ -34,20 +32,5 @@ const conversationSchema = new Schema<Conversation>({
     },
 });
 
-// // Define the ConversationModel with correct typings
-// export const ConversationModel: Model<ConversationDocument> = mongoose.model<
-//     ConversationDocument
-// >("Conversation", conversationSchema);
-
-// // Define the ConversationDocument with correct typings
-// export type ConversationDocument = Conversation & Document;
-
-// Define the ConversationInput with correct typings
-export type ConversationInput = Omit<Conversation, 'createdAt' | 'updatedAt'>;
-// Define the ConversationPopulated with correct typings
-export type ConversationPopulated = Omit<Conversation, 'participants' | 'messages'> & {
-    participants: User[];
-    messages: Message[];
-};
-// Define the ConversationPopulatedDocument with correct typings
-export type ConversationPopulatedDocument = ConversationPopulated & Document;
+// Define the ConversationModel with correct typings
+export const ConversationModel = model<Conversation>("Conversation", conversationSchema);
