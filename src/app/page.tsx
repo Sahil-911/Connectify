@@ -1,208 +1,88 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Grid, Typography, TextField, Button, Paper, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import Image from 'next/image';
-import CycloneIcon from '@mui/icons-material/Cyclone';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { Grid, Button, Typography, Box } from '@mui/material';
+import { Cyclone } from '@mui/icons-material';
 
-const imageStyles = {
-    width: '100%',
-    height: '100%',
-};
+const LandingPage = () => {
+    // import { useRouter } from 'next/router';
 
-const heading = {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    // marginBottom: '1rem',
-};
+    // const LandingPage = () => {
+    // const router = useRouter();
 
-const inputStyles = {
-    marginBottom: '1rem',
-    backgroundColor: '#333',
-    borderRadius: '20px',
-    color: '#fff'
-};
+    //     // Rest of your code...
 
-const RegisterPage = () => {
-    const [fullName, setFullName] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [gender, setGender] = useState('');
+    //     return (
+    //         // Your JSX code...
+    //     );
+    // };
 
-    const handleGenderChange = () => {
-        // setGender(event.target.value);
-    };
-
-    const submitHandler = () => {
-        // e.preventDefault();
-        // Your form submission logic here
-    };
+    // export default LandingPage;
 
     return (
-        <Grid container style={{ height: '100%' }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
-            {/* Left 60% - Image */}
-            <Grid item xs={12} md={6} lg={7.5} style={{
-                display: 'flex', justifyContent: 'center', alignItems: 'center',
-                backgroundImage: `url(/patternpad1.svg)`,
-                backgroundRepeat: 'repeat'
-            }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
-                <CycloneIcon
-                    sx={{
-                        fontSize: '3000%',
-                        animation: 'rotate 2s linear infinite' // Apply the animation
-                    }} />
-                {/* <Image style={{ backgroundColor: '#1f1f1f' }} src="/logo.svg" alt="Register" width={500} height={500} /> */}
-            </Grid>
-
-            {/* Right 40% - Registration Form */}
-            <Grid item xs={12} md={6} lg={4.5} component={Paper} sx={{ bgcolor: '#1f1f1f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{
-                    padding: '15px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-                }}>
-                    <Typography sx={heading} variant="h4" gutterBottom>
-                        Sign up
+        <div style={{
+            minHeight: '100vh', // Set minimum height to cover the viewport
+            backgroundImage: `url(/patternpad3.svg)`,
+            backgroundRepeat: 'repeat',
+            display: 'flex', // Add flex to fill the entire viewport
+            alignItems: 'center', // Center items vertically
+            justifyContent: 'center', // Center items horizontally
+            color: '#fff',
+            // paddingTop:'100px',
+            // paddingBottom:'100px'
+        }}>
+            <Grid
+                container
+                spacing={3}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Grid item>
+                    <Typography variant="h2" align="center" gutterBottom>
+                        Welcome to my <span style={{ color: '#007bff' }}>Chat-App!</span>
                     </Typography>
-                    <Typography variant="body1" sx={{ mb: 4 }} gutterBottom>
-                        Enter your information to get started
+                </Grid>
+                <Grid item>
+                    <Cyclone style={{ fontSize: '300px' }} />
+                </Grid>
+                <Grid item>
+                    <Typography variant="h5" align="center" gutterBottom>
+                        Join our community and start chatting now.
                     </Typography>
-                    {/* Registration form */}
-                    <form onSubmit={submitHandler}>
-                        <Typography variant='caption'>
-                            Full Name
-                        </Typography>
-                        <TextField
-                            placeholder="Full Name"
-                            id="fullName"
-                            name="fullName"
-                            type="text"
-                            variant='outlined'
-                            size='small'
-                            //margin='normal'
-                            fullWidth
-                            onChange={(e) => setFullName(e.target.value)}
-                            required
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            Username
-                        </Typography>
-                        <TextField
-                            placeholder="Username"
-                            id="username"
-                            name="username"
-                            type="text"
-                            variant="outlined"
-                            //margin='normal'
-                            size='small'
-                            fullWidth
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            email
-                        </Typography>
-                        <TextField
-                            placeholder="Email"
-                            id="email"
-                            name="email"
-                            type="email"
-                            variant="outlined"
-                            size='small'
-                            //margin='normal'
-                            fullWidth
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            password
-                        </Typography>
-                        <TextField
-                            placeholder="Password"
-                            id="password"
-                            name="password"
-                            type="password"
-                            variant="outlined"
-                            size='small'
-                            //margin='normal'
-                            fullWidth
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            confirm password
-                        </Typography>
-                        <TextField
-                            placeholder="Confirm Password"
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type="password"
-                            variant="outlined"
-                            size='small'
-                            //margin='normal'
-                            fullWidth
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            Gender
-                        </Typography>
-                        <div style={{ display: 'flex' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                                <input
-                                    type="radio"
-                                    id="male"
-                                    name="gender"
-                                    value="male"
-                                    checked={gender === 'male'}
-                                    onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
-                                />
-                                <label htmlFor="male" style={{ fontSize: '16px' }}>Male</label>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', marginRight: '20px' }}>
-                                <input
-                                    type="radio"
-                                    id="female"
-                                    name="gender"
-                                    value="female"
-                                    checked={gender === 'female'}
-                                    onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
-                                />
-                                <label htmlFor="female" style={{ fontSize: '16px' }}>Female</label>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <input
-                                    type="radio"
-                                    id="other"
-                                    name="gender"
-                                    value="other"
-                                    checked={gender === 'other'}
-                                    onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
-                                />
-                                <label htmlFor="other" style={{ fontSize: '16px' }}>Other</label>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            {/* Submit button */}
-                            <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
-                                Sign up
+                </Grid>
+                <Grid item container spacing={2} justifyContent="center">
+                    <Grid item>
+                        <Link href='/login'>
+                            <Button variant="contained" color="primary"
+                                sx={{ bgcolor: 'blue' }}
+                            //  onClick={() => router.push('/login')}
+                            >
+                                Login
                             </Button>
-                            {/* Login link */}
-                            <a href="/login" style={{ textDecoration: 'none', color: 'blue', fontSize: '12px' }}>Alredy have an account? Log in</a>
-                        </div>
-                    </form>
-                </div>
+                        </Link>
+                    </Grid>
+                    <Grid item>
+                        <Link href='/register'>
+                            <Button variant="contained" color="secondary"
+                            //  onClick={() => router.push('/register')}
+                            >
+                                Sign Up
+                            </Button>
+                        </Link>
+                    </Grid>
+                </Grid>
+                <Grid item>
+                    <Box mt={3}>
+                        <Typography variant="body2" align="center">
+                            Forgot Password? <Link href="/forgotpass" style={{ textDecoration: 'none', color: '#007bff' }}> Click here </Link>.
+                        </Typography>
+                    </Box>
+                </Grid>
             </Grid>
-        </Grid>
+        </div>
     );
 };
 
-export default RegisterPage;
+export default LandingPage;

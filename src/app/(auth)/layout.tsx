@@ -25,7 +25,8 @@ export default function RootLayout({
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        {/* <Header /> */}
         <div style={{ flex: 1 }}>
           {children}
         </div>
