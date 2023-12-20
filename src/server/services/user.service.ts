@@ -3,6 +3,7 @@ import { UserInput, User } from '@/types/User.interface';
 import bcrypt from 'bcrypt';
 
 export const createUser = async (user: UserInput) => {
+    console.log('we are in createUser');
     const userExists = await UserModel.exists({ username: user?.username }) || await UserModel.exists({ email: user?.email });
     if (userExists) {
         throw new Error('User already exists');
@@ -13,7 +14,7 @@ export const createUser = async (user: UserInput) => {
             username: user?.username,
             email: user?.email,
             password: hashedPassword,
-            bio: user?.bio,
+            bio: "",
             gender: user?.gender,
             createdAt: Date.now(),
             updatedAt: Date.now()

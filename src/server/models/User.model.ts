@@ -1,7 +1,7 @@
-import { UserInput } from '@/types/User.interface';
-import { Schema, Model, model } from 'mongoose';
+import { User } from '@/types/User.interface';
+import { Schema, Model, model, models } from 'mongoose';
 
-const userSchema = new Schema<UserInput>({
+const userSchema = new Schema<User>({
     email: {
         type: String,
         required: true,
@@ -25,19 +25,20 @@ const userSchema = new Schema<UserInput>({
     },
     gender: {
         type: String,
-        enum: ['m', 'f', 'o'],
         required: true,
     },
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        required: true,
-        default: Date.now
-    },
+    connections: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    pendingConnections: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
+    connectionRequests: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    }],
 });
 
-export const UserModel: Model<UserInput> = model<UserInput>("User", userSchema);
+export const UserModel: Model<User> = models["User"] ?? model<User>("User", userSchema);

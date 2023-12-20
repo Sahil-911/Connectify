@@ -6,9 +6,10 @@ export interface UserInput {
     email: string;
     password: string;
     bio?: string;
-    gender: 'm' | 'f' | 'o';
-    createdAt: Date;
-    updatedAt: Date;
+    gender: string;
+    connections?: User[];
+    pendingConnections?: User[];
+    connectionRequests?: User[];
 }
 
-export type User = UserInput & { _id: ObjectId };
+export type User = UserInput;
