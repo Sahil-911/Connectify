@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react';
 import { Grid, Typography, TextField, Button, Paper, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import Image from 'next/image';
 import CycloneIcon from '@mui/icons-material/Cyclone';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { postUser } from './action';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const imageStyles = {
     width: '100%',
@@ -14,7 +19,6 @@ const imageStyles = {
 const heading = {
     fontWeight: 'bold',
     textAlign: 'center',
-    // marginBottom: '1rem',
 };
 
 const inputStyles = {
@@ -25,51 +29,78 @@ const inputStyles = {
 };
 
 const RegisterPage = () => {
-    const [fullName, setFullName] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [gender, setGender] = useState('');
+    const router = useRouter();
 
-    const [isHovered, setIsHovered] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleMouseOver = () => {
-        setIsHovered(true);
-    };
+    const formSchema = yup.object().shape({
+        fullName: yup.string().required('Full name is required'),
+        username: yup.string().required('Username is required'),
+        email: yup.string().email('Invalid email address').required('Email is required'),
+        password: yup.string().required('Password is required'),
+        confirmPassword: yup.string().required('Confirm password is required'),
+        gender: yup.string().oneOf(['m', 'f', 'o'], 'Invalid gender').required('Gender is required')
+    });
 
-    const handleMouseOut = () => {
-        setIsHovered(false);
-    };
-
+    const formik = useFormik({
+        initialValues: {
+            fullName: '',
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            gender: ''
+        },
+        validationSchema: formSchema,
+        onSubmit: (values, { setFieldError }) => {
+            console.log(values);
+            postUser({
+                user_input: {
+                    name: values.fullName,
+                    username: values.username,
+                    email: values.email,
+                    password: values.password,
+                    gender: values.gender,
+                }
+            })
+                .then((res) => {
+                    if (res.user) {
+                        router.push("/login");
+                        toast.success('Account created successfully');
+                    }
+                    else {
+                        setFieldError('gender', res.message);
+                        toast.error(res.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Submission error:', error);
+                });
+        },
+    });
 
     const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setGender(event.target.value);
+        formik.setFieldValue('gender', event.target.value);
+        console.log(formik.values.gender)
     };
 
-    const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // Your form submission logic here
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        formik.handleSubmit(event);
     };
 
     return (
         <Grid container style={{ height: '100%' }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
-            {/* Left 60% - Image */}
             <Grid item xs={12} md={6} lg={7.5} style={{
                 display: 'flex', justifyContent: 'center', alignItems: 'center',
                 backgroundImage: `url(/patternpad1.svg)`,
                 backgroundRepeat: 'repeat'
             }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
-                <CycloneIcon
-                    sx={{
-                        fontSize: '2500%',
-                        animation: 'rotate 2s linear infinite' // Apply the animation
-                    }} />
-                {/* <Image style={{ backgroundColor: '#1f1f1f' }} src="/logo.svg" alt="Register" width={500} height={500} /> */}
+                <CycloneIcon sx={{ fontSize: '2500%' }} />
             </Grid>
 
-            {/* Right 40% - Registration Form */}
-            <Grid item xs={12} md={6} lg={4.5} component={Paper} sx={{ bgcolor: '#1f1f1f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <Grid item xs={12} md={6} lg={4.5} component={Paper} elevation={0} sx={{ bgcolor: '#1f1f1f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{
                     padding: '15px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
                 }}>
@@ -80,7 +111,7 @@ const RegisterPage = () => {
                         Enter your information to get started
                     </Typography>
                     {/* Registration form */}
-                    <form onSubmit={submitHandler}>
+                    <form onSubmit={handleSubmit}>
                         <Typography variant='caption'>
                             Full Name
                         </Typography>
@@ -91,14 +122,19 @@ const RegisterPage = () => {
                             type="text"
                             variant='outlined'
                             size='small'
-                            //margin='normal'
+
                             fullWidth
-                            onChange={(e) => setFullName(e.target.value)}
+                            onChange={formik.handleChange}
+                            value={formik.values.fullName}
+                            error={
+                                formik.touched.fullName && Boolean(formik.errors.fullName)
+                            }
+                            helperText={formik.touched.fullName && formik.errors.fullName}
                             required
                             InputProps={{
                                 style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
+                                    color: '#fff',
+                                    borderRadius: '20px',
                                 }
                             }}
                             style={inputStyles}
@@ -112,15 +148,20 @@ const RegisterPage = () => {
                             name="username"
                             type="text"
                             variant="outlined"
-                            //margin='normal'
+
                             size='small'
                             fullWidth
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={formik.handleChange}
+                            value={formik.values.username}
+                            error={
+                                formik.touched.username && Boolean(formik.errors.username)
+                            }
+                            helperText={formik.touched.username && formik.errors.username}
                             required
                             InputProps={{
                                 style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
+                                    color: '#fff',
+                                    borderRadius: '20px',
                                 }
                             }}
                             style={inputStyles}
@@ -135,14 +176,18 @@ const RegisterPage = () => {
                             type="email"
                             variant="outlined"
                             size='small'
-                            //margin='normal'
                             fullWidth
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
+                            error={
+                                formik.touched.email && Boolean(formik.errors.email)
+                            }
+                            helperText={formik.touched.email && formik.errors.email}
                             required
                             InputProps={{
                                 style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
+                                    color: '#fff',
+                                    borderRadius: '20px',
                                 }
                             }}
                             style={inputStyles}
@@ -157,14 +202,18 @@ const RegisterPage = () => {
                             type="password"
                             variant="outlined"
                             size='small'
-                            //margin='normal'
                             fullWidth
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={formik.handleChange}
+                            value={formik.values.password}
+                            error={
+                                formik.touched.password && Boolean(formik.errors.password)
+                            }
+                            helperText={formik.touched.password && formik.errors.password}
                             required
                             InputProps={{
                                 style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
+                                    color: '#fff',
+                                    borderRadius: '20px',
                                 },
                             }}
                             style={inputStyles}
@@ -179,14 +228,18 @@ const RegisterPage = () => {
                             type="password"
                             variant="outlined"
                             size='small'
-                            //margin='normal'
                             fullWidth
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            onChange={formik.handleChange}
+                            value={formik.values.confirmPassword}
+                            error={
+                                formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)
+                            }
+                            helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                             required
                             InputProps={{
                                 style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
+                                    color: '#fff',
+                                    borderRadius: '20px',
                                 }
                             }}
                             style={inputStyles}
@@ -200,10 +253,10 @@ const RegisterPage = () => {
                                     type="radio"
                                     id="male"
                                     name="gender"
-                                    value="male"
-                                    checked={gender === 'male'}
+                                    value="m"
+                                    checked={formik.values.gender === 'm'}
                                     onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
+                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }}
                                 />
                                 <label htmlFor="male" style={{ fontSize: '16px' }}>Male</label>
                             </div>
@@ -212,10 +265,10 @@ const RegisterPage = () => {
                                     type="radio"
                                     id="female"
                                     name="gender"
-                                    value="female"
-                                    checked={gender === 'female'}
+                                    value="f"
+                                    checked={formik.values.gender === 'f'}
                                     onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
+                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }}
                                 />
                                 <label htmlFor="female" style={{ fontSize: '16px' }}>Female</label>
                             </div>
@@ -224,10 +277,10 @@ const RegisterPage = () => {
                                     type="radio"
                                     id="other"
                                     name="gender"
-                                    value="other"
-                                    checked={gender === 'other'}
+                                    value="o"
+                                    checked={formik.values.gender === 'o'}
                                     onChange={handleGenderChange}
-                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }} // Adjust size of radio button
+                                    style={{ marginRight: '5px', transform: 'scale(1.5)' }}
                                 />
                                 <label htmlFor="other" style={{ fontSize: '16px' }}>Other</label>
                             </div>
@@ -237,18 +290,9 @@ const RegisterPage = () => {
                             <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
                                 Sign up
                             </Button>
-                            {/* Login link */}
-                            <a href="/login"
-                                style={{
-                                    textDecoration: isHovered ? 'underline' : 'none',
-                                    color: '#007bff',
-                                }}
-                                onMouseOver={handleMouseOver}
-                                onMouseOut={handleMouseOut}
-                            >
+                            <Link href="/login" style={{ textDecoration: 'none', color: '#007bff', fontSize: '12px' }}>
                                 Already have an account? Log in
-                            </a>
-                            {/* <a href="/login" style={{ textDecoration: 'none', color: 'blue', fontSize: '12px' }}>Alredy have an account? Log in</a> */}
+                            </Link>
                         </div>
                     </form>
                 </div>

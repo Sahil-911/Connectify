@@ -4,7 +4,12 @@ import React, { useState } from 'react';
 import { Grid, Typography, TextField, Button, Paper } from '@mui/material';
 import CycloneIcon from '@mui/icons-material/Cyclone';
 import Link from 'next/link';
-
+import { useFormik } from 'formik';
+import { useRouter } from "next/navigation";
+import * as yup from 'yup';
+import { useAuth } from '@/context/session';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const imageStyles = {
     width: '100%',
@@ -25,98 +30,129 @@ const inputStyles = {
 };
 
 const LoginPage = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const { login } = useAuth();
+    const router = useRouter();
 
-    const submitHandler = () => {
-        // Your form submission logic here
+    // const [username, setUsername] = useState('');
+    // const [password, setPassword] = useState('');
+
+    const validationSchema = yup.object({
+        username: yup.string().required('Username is required'),
+        password: yup.string().required('Password is required'),
+    });
+
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            password: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            login(values).then((res) => {
+                if (!res.session) {
+                    // alert(res.message);
+                    console.log(res.message);
+                    toast.error(res.message);
+                    return;
+                }
+                else {
+                    console.log('Logged in successfully!')
+                    // toast.success('Logged in successfully!');
+                    router.push('/dashboard');
+                }
+            });
+        },
+    });
+
+    const submitHandler = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        formik.handleSubmit();
     };
 
     return (
-        <Grid container style={{ height: '100%' }} sx={{ bgcolor: '#1f1f1f' }}>
-            {/* Left 60% - Image */}
-            <Grid item xs={12} md={6} lg={7.5} style={{
-                display: 'flex', justifyContent: 'center', alignItems: 'center',
-                backgroundImage: `url(/patternpad1.svg)`,
-                backgroundRepeat: 'repeat'
-            }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
-                <CycloneIcon
-                    sx={{
-                        fontSize: '2500%',
-                        animation: 'rotate 2s linear infinite' // Apply the animation
-                    }} />
-                {/* <Image style={{ backgroundColor: '#1f1f1f' }} src="/logo.svg" alt="Register" width={500} height={500} /> */}
-            </Grid>
+        <>
+            <ToastContainer />
+            <Grid container style={{ height: '100%' }} sx={{ bgcolor: '#1f1f1f' }}>
+                <Grid item xs={12} md={6} lg={7.5} style={{
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    backgroundImage: `url(/patternpad1.svg)`,
+                    backgroundRepeat: 'repeat'
+                }} sx={{ bgcolor: '#1f1f1f', color: '#fff' }}>
+                    <CycloneIcon
+                        sx={{
+                            fontSize: '2500%',
+                            animation: 'rotate 2s linear infinite' // Apply the animation
+                        }} />
+                </Grid>
 
-            {/* Right 40% - Login Form */}
-            <Grid item xs={12} md={6} lg={4.5} component={Paper} sx={{ bgcolor: '#1f1f1f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <Typography sx={{ ...heading, mb: 4 }} variant="h4" gutterBottom>
-                        Log in
-                    </Typography>
-                    {/* Login form */}
-                    <form onSubmit={submitHandler}>
-                        <Typography variant='caption'>
-                            Username
+                <Grid item xs={12} md={6} lg={4.5} component={Paper} elevation={0} sx={{ bgcolor: '#1f1f1f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                        <Typography sx={{ ...heading, mb: 4 }} variant="h4" gutterBottom>
+                            Log in
                         </Typography>
-                        <TextField
-                            placeholder="Username"
-                            id="username"
-                            name="username"
-                            type="text"
-                            variant="outlined"
-                            size='small'
-                            fullWidth
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            InputProps={{
-                                style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
-                                }
-                            }}
-                            style={inputStyles}
-                        />
-                        <Typography variant='caption'>
-                            Password
-                        </Typography>
-                        <TextField
-                            placeholder="Password"
-                            id="password"
-                            name="password"
-                            type="password"
-                            variant="outlined"
-                            size='small'
-                            fullWidth
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            InputProps={{
-                                style: {
-                                    color: '#fff', // Set text color to white
-                                    borderRadius: '20px', // Set border radius
-                                }
-                            }}
-                            style={inputStyles}
-                        />
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            {/* Submit button */}
-                            <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
-                                Log in
-                            </Button>
-                            {/* Register and Forgot Password links */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '12px' }}>
-                                <Link href="/register" style={{ textDecoration: 'none', color: '#007bff', marginLeft: '5px' }} passHref>
-                                    Sign up
-                                </Link>
-                                <Link href="/forgotpass" style={{ textDecoration: 'none', color: '#007bff', marginRight: '5px' }} passHref>
-                                    Forgot Password?
-                                </Link>
+                        <form onSubmit={submitHandler}>
+                            <Typography variant='caption'>
+                                Username
+                            </Typography>
+                            <TextField
+                                placeholder="Username"
+                                id="username"
+                                name="username"
+                                type="text"
+                                variant="outlined"
+                                size='small'
+                                fullWidth
+                                onChange={(e) => formik.handleChange(e)}
+                                onBlur={formik.handleBlur}
+                                required
+                                InputProps={{
+                                    style: {
+                                        color: '#fff',
+                                        borderRadius: '20px',
+                                    }
+                                }}
+                                style={inputStyles}
+                            />
+                            <Typography variant='caption'>
+                                Password
+                            </Typography>
+                            <TextField
+                                placeholder="Password"
+                                id="password"
+                                name="password"
+                                type="password"
+                                variant="outlined"
+                                size='small'
+                                fullWidth
+                                onChange={(e) => formik.handleChange(e)}
+                                onBlur={formik.handleBlur}
+                                required
+                                InputProps={{
+                                    style: {
+                                        color: '#fff',
+                                        borderRadius: '20px',
+                                    }
+                                }}
+                                style={inputStyles}
+                            />
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
+                                    Log in
+                                </Button>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '12px' }}>
+                                    <Link href="/register" style={{ textDecoration: 'none', color: '#007bff', marginLeft: '5px' }} passHref>
+                                        Sign up
+                                    </Link>
+                                    <Link href="/forgotpass" style={{ textDecoration: 'none', color: '#007bff', marginRight: '5px' }} passHref>
+                                        Forgot Password?
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
+                </Grid>
             </Grid>
-        </Grid>
+        </>
     );
 };
 

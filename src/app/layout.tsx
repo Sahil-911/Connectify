@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-// import Header from '@/components/header';
+import { SessionProvider } from '@/context/session';
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -23,13 +23,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div style={{ flex: 1 }}>
-          {children}
-        </div>
-      </div>
-    </ThemeProvider>
+    <html>
+      <head>
+        <title>chat-app</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </head>
+      <body>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <SessionProvider>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ flex: 1 }}>
+                {children}
+              </div>
+            </div>
+          </SessionProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -117,9 +117,9 @@ function Chats() {
           justifyContent: 'flex-end',
           backgroundColor: '#262626'
         }}>
-          <div style={{ width: '98%', marginBottom: '0px', display: 'flex' }}>
+          <div style={{ width: '98%', marginBottom: '10px', display: 'flex' }}>
             {/* Emoji icon */}
-            <IconButton sx={{ color: 'white', backgroundColor: '#333', borderRadius: '4px 0 0 4px', marginTop: '8px', height: '38px', mt: 1.14 }}>
+            <IconButton sx={{ color: 'white', backgroundColor: '#333', borderRadius: '4px 0 0 4px', marginTop: '8px', height: '39px', mt: 1.1 }}>
               <EmojiEmotionsIcon fontSize='small' />
             </IconButton>
             <TextField
@@ -146,7 +146,7 @@ function Chats() {
                 },
               }}
             />
-            <IconButton type="submit" sx={{ color: 'white', backgroundColor: '#333', borderRadius: '0 4px 4px 0', height: '38px', mt: 1.14 }}>
+            <IconButton type="submit" sx={{ color: 'white', backgroundColor: '#333', borderRadius: '0 4px 4px 0', height: '39px', mt: 1.1 }}>
               <SendIcon fontSize='small' />
             </IconButton>
           </div>
