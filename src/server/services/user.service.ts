@@ -1,6 +1,8 @@
 import { UserModel } from '@/server/models/User.model';
 import { UserInput, User } from '@/types/User.interface';
 import bcrypt from 'bcrypt';
+import { Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 export const createUser = async (user: UserInput) => {
     console.log('we are in createUser');
@@ -23,11 +25,11 @@ export const createUser = async (user: UserInput) => {
     }
 };
 
-export const getUserById = async (id: string) => {
+export const getUserById = async ({ id }: { id: string }) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const user = await UserModel.findById(id);
-        return user;
+        return castDocumentToUser(user);
     } else {
         throw new Error('User not found');
     }
@@ -37,7 +39,7 @@ export const updateUserById = async (id: string, user: UserInput) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const updatedUser = await UserModel.findByIdAndUpdate(id, user);
-        return updatedUser;
+        return castDocumentToUser(updatedUser);
     } else {
         throw new Error('User not found');
     }
@@ -52,3 +54,16 @@ export const deleteUserById = async (id: string) => {
         throw new Error('User not found');
     }
 }
+
+function castDocumentToUser(
+    user: (Document<unknown, {}, UserInput> & UserInput & {
+        _id: Types.ObjectId;
+    }) | null
+) {
+    if (user instanceof Document) {
+        return user.toObject();
+    } else {
+        return null; // or handle the case when user is null or doesn't contain a toJSON method
+    }
+}
+

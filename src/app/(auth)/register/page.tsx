@@ -122,7 +122,6 @@ const RegisterPage = () => {
                             type="text"
                             variant='outlined'
                             size='small'
-
                             fullWidth
                             onChange={formik.handleChange}
                             value={formik.values.fullName}

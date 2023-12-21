@@ -118,7 +118,7 @@ const contacts: Contact[] = [
 
 const Contacts = () => {
     return (
-        <div style={{ borderRadius: '6px 0 0 0', height: '100%', backgroundColor: '#262626', border: '1px solid #1f1f1f', paddingBottom: 0 }}>
+        <div style={{ borderRadius: '6px 0 0 0', height: '100%', backgroundColor: '#262626', border: '1px solid #1f1f1f', paddingBottom: 0, minWidth:'200px' }}>
             <Typography variant="h6" sx={{ ml: 1.5, py: 2, mt: 0 }}>
                 Contacts
             </Typography>

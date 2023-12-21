@@ -31,15 +31,20 @@ export const createTokenWithEmail = async ({ email, password }: { email: string,
         throw new Error('Password does not match');
     else {
         const id = user._id;
-        const access_token = sign({ id }, secret, { expiresIn: '1h' });
+        const access_token = sign({ id }, secret, { expiresIn: '1d' });
         return access_token;
     }
 };
 
 export const verifyToken = ({ token }: { token: string }) => {
+    console.log('verify', token);
+    console.log(secret);
     if (secret === undefined) throw new Error('JWT_SECRET is not defined');
     const payload = verify(token, secret, (err, decoded) => {
-        if (err) throw new Error('Invalid token');
+        if (err) {
+            console.log(err);
+            throw new Error('Invalid token');
+        }
         return decoded;
     });
     return (payload as any) as { id: string };
