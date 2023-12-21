@@ -18,6 +18,7 @@ export default function AddContact() {
         GetAllProfiles(session)
             .then((response) => {
                 const fetchedUsers = response?.profiles?.users || [];
+                console.log(fetchedUsers);
                 setUsers(fetchedUsers as UserInput[]);
             })
             .catch((error) => {
