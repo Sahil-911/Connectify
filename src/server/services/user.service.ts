@@ -55,6 +55,14 @@ export const deleteUserById = async (id: string) => {
     }
 }
 
+export const getAllUsers = async () => {
+    const users = await UserModel.find({});
+    return {
+        users: users.map((user) => castDocumentToUser(user)),
+        count: users.length
+    };
+}
+
 function castDocumentToUser(
     user: (Document<unknown, {}, UserInput> & UserInput & {
         _id: Types.ObjectId;

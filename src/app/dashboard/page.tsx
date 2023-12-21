@@ -6,6 +6,7 @@ import Contacts from '@/components/contacts';
 import Chats from '@/components/chats';
 import CC from '@/components/cc';
 import Profile from '@/components/profile';
+import AddContact from '@/components/addCotact';
 
 export default function MainPage() {
   return (
@@ -15,7 +16,8 @@ export default function MainPage() {
       </div>
       <div style={{ display: 'flex', backgroundColor: '#1f1f1f', width: '100%', height: '100%' }}>
         {/* <CC /> */}
-        <Profile />
+        {/* <Profile /> */}
+        <AddContact/>
       </div>
     </div>
   );
