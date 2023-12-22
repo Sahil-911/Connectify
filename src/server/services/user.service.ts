@@ -1,7 +1,7 @@
 import { UserModel } from '@/server/models/User.model';
 import { UserInput, User } from '@/types/User.interface';
 import bcrypt from 'bcrypt';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 import { Types } from 'mongoose';
 
 export const createUser = async (user: UserInput) => {
@@ -35,6 +35,9 @@ export const getUserById = async ({ id }: { id: string }) => {
             email: user?.email,
             bio: user?.bio,
             gender: user?.gender,
+            connection: user?.connections,
+            pendingConnection: user?.pendingConnections,
+            connectionRequests: user?.connectionRequests
         }
     } else {
         throw new Error('User not found');
@@ -67,6 +70,71 @@ export const getAllUsers = async () => {
         users: users.map((user) => castDocumentToUser(user)),
         count: users.length
     };
+}
+
+export const connectByIdRequest = async (userId: string, id: string) => {
+
+    console.log('service', userId, id);
+    const user2Exists = await UserModel.exists({ _id: id });
+    if (user2Exists) console.log('le');
+    const user1 = await UserModel.findById({ _id: userId });
+    if (user1) console.log('yes user1');
+    const user2 = await UserModel.findById({ _id: id });
+    if (user2) console.log('yes user2');
+    if (user2Exists) {
+        if (user1 && user1.connectionRequests?.includes(new Types.ObjectId(id) as any)) {
+            console.log('Already');
+            throw new Error('Already requested');
+        }
+        else if (user2 && user2.pendingConnections?.includes(new Types.ObjectId(userId) as any)) {
+            console.log('requested');
+            throw new Error('Already requested');
+        }
+        else {
+            if (user1) {
+                user1.connectionRequests = user1.connectionRequests || [];
+                user1.connectionRequests.push(new Types.ObjectId(id) as any);
+                await user1.save();
+            }
+            if (user2) {
+                user2.pendingConnections = user2.pendingConnections || [];
+                user2.pendingConnections.push(new Types.ObjectId(userId) as any);
+                await user2.save();
+            }
+            console.log(user1, user2);
+            return { message: 'Connected successfully' };
+        }
+    }
+    else {
+        console.log('hu vaat kare');
+        throw new Error('User not found');
+    }
+}
+
+export const disconnectByIdWithdrawal = async (userId: string, id: string) => {
+    const user2Exists = await UserModel.exists({ _id: id });
+    const user1 = await UserModel.findById({ _id: userId });
+    const user2 = await UserModel.findById({ _id: id });
+    if (user2Exists) {
+        if (user1 && user1.connectionRequests?.includes(new Types.ObjectId(id) as any)) {
+            const objectId1 = new Types.ObjectId(userId);
+            const objectId2 = new Types.ObjectId(id);
+            if (user1) {
+                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== objectId2.toString());
+                await user1.save();
+            }
+            if (user2) {
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== objectId1.toString());
+                await user2.save();
+            }
+            console.log(user1, user2);
+            return { message: 'Withdrawal Completed' };
+        } else {
+            throw new Error('Not connected');
+        }
+    } else {
+        throw new Error('User not found');
+    }
 }
 
 function castDocumentToUser(
