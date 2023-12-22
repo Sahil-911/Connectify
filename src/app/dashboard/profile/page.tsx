@@ -6,7 +6,7 @@ import { FetchProfile, UpdateProfile } from './action';
 import { useAuth } from '@/context/session';
 import { useRouter } from 'next/navigation';
 import { UserInput } from '@/types/User.interface';
-import styles from './scroll.module.css'; // Import the CSS module
+import styles from '@/components/scroll.module.css'; // Import the CSS module
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -27,7 +27,7 @@ const Profile = () => {
                 // router.push("/login");
             } else {
                 console.log(profile);
-                setProfileDetails(profile);
+                setProfileDetails(profile as any);
             }
         });
     }, []);
@@ -119,7 +119,7 @@ const Profile = () => {
                         // router.push("/login");
                     } else {
                         console.log(profile);
-                        setProfileDetails(profile);
+                        setProfileDetails(profile as any);
                     }
                 });
             }
@@ -270,7 +270,7 @@ const Profile = () => {
                             </Grid>
 
                             {/* Bio field */}
-                            <Typography  variant='caption' sx={{ color: '#fff', mt: 2, pt: 2 }}>
+                            <Typography variant='caption' sx={{ color: '#fff', mt: 2, pt: 2 }}>
                                 Bio
                             </Typography>
                             <TextField
@@ -296,7 +296,7 @@ const Profile = () => {
                                         border: '2px solid grey'
                                     }
                                 }}
-                                sx={{ mt: 1, overflowY:'auto' }} // Add margin-top for spacing
+                                sx={{ mt: 1, overflowY: 'auto' }} // Add margin-top for spacing
                             />
                             <Button type="submit" variant='contained' sx={{ position: 'absolute', bottom: '20px', right: '20px', bgcolor: '#007bff' }}>Save Changes</Button>
                             <Button variant='contained' onClick={() => setUpdate(false)} sx={{ position: 'absolute', bottom: '20px', right: '180px', bgcolor: 'red' }}>Cancel</Button>

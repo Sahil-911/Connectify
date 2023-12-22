@@ -29,7 +29,13 @@ export const getUserById = async ({ id }: { id: string }) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const user = await UserModel.findById(id);
-        return castDocumentToUser(user);
+        return {
+            name: user?.name,
+            username: user?.username,
+            email: user?.email,
+            bio: user?.bio,
+            gender: user?.gender,
+        }
     } else {
         throw new Error('User not found');
     }
@@ -69,7 +75,7 @@ function castDocumentToUser(
     }) | null
 ) {
     if (user instanceof Document) {
-        return user.toObject();
+        return user.toJSON();
     } else {
         return null; // or handle the case when user is null or doesn't contain a toJSON method
     }

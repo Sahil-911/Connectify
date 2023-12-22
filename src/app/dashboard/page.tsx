@@ -1,24 +1,17 @@
-'use client';
+'use client'
 
 import React from 'react';
-import Sidebar from '@/components/sidebar';
-import Contacts from '@/components/contacts';
-import Chats from '@/components/chats';
-import CC from '@/components/cc';
-import Profile from '@/components/profile';
-import AddContact from '@/components/addCotact';
+import CC from '@/app/dashboard/cc';
 
-export default function MainPage() {
+const MainPage = () => {
+
   return (
-    <div style={{ display: 'flex', height: '100%' }}>
-      <div style={{ backgroundColor: '#1f1f1f', color: '#e0e0e0', height: '100%', maxWidth: '60px', flex: 'none' }}>
-        <Sidebar />
-      </div>
+    <div style={{ display: 'flex', height: '100%', width: '100%', borderRadius: '6px 0 0 0' }}>
       <div style={{ display: 'flex', backgroundColor: '#1f1f1f', width: '100%', height: '100%' }}>
-        {/* <CC /> */}
-        {/* <Profile /> */}
-        <AddContact/>
+        <CC />
       </div>
     </div>
   );
-}
+};
+
+export default MainPage;

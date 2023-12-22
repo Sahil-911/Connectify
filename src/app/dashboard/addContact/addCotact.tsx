@@ -2,8 +2,8 @@
 
 import { Grid, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import UserCard from './userCard';
-import styles from './scroll.module.css';
+import UserCard from '../../../components/userCard';
+import styles from '@/components/scroll.module.css';
 import { GetAllProfiles } from './action';
 import { useAuth } from '@/context/session';
 import { UserInput } from '@/types/User.interface';
@@ -39,8 +39,8 @@ export default function AddContact() {
     };
 
     return (
-        <Grid container direction="column">
-            <Grid item sx={{ bgcolor: '#333', pt: 3, display: 'flex', justifyContent: 'center' }}>
+        <Grid container direction="column" style={{ width: '100%' }}>
+            <Grid item sx={{ bgcolor: '#333', pt: 3, display: 'flex', justifyContent: 'center', borderRadius: '6px 0 0 0' }}>
                 <Typography variant='h4' style={{ color: '#fff' }}>Add Contact</Typography>
             </Grid>
             <Grid item sx={{ bgcolor: '#333', p: '1rem', display: 'flex', justifyContent: 'center' }}>

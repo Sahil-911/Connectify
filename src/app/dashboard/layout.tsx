@@ -1,21 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ThemeProvider, CssBaseline } from '@mui/material';
 import Header from '@/components/header';
-import { createTheme } from '@mui/material/styles';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1f1f1f',
-    },
-    secondary: {
-      main: '#1f1f1f',
-    },
-  },
-  // Other theme configurations...
-});
+import Sidebar from '@/app/dashboard/sidebar';
 
 export default function RootLayout({
   children,
@@ -23,14 +10,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <Header />
-        <div style={{ flex: 1, overflowY: 'hidden' }}>
-          {children}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <Header />
+      <div style={{ flex: 1, overflowY: 'hidden' }}>
+        <div style={{ display: 'flex', height: '100%' }}>
+          <div style={{ backgroundColor: '#1f1f1f', color: '#e0e0e0', height: '100%', maxWidth: '60px', flex: 'none' }}>
+            <Sidebar />
+          </div>
+          <div style={{ display: 'flex', backgroundColor: '#1f1f1f', width: '100%', height: '100%', borderRadius: '6px 0 0 0' }}>
+            {children}
+          </div>
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }

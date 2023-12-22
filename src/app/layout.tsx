@@ -33,7 +33,7 @@ export default function RootLayout({
           <CssBaseline />
           <SessionProvider>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, backgroundColor:'#1f1f1f' }}>
                 {children}
               </div>
             </div>
