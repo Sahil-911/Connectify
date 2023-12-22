@@ -1,6 +1,6 @@
 'use client';
 
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import UserCard from './userCard';
 import styles from './scroll.module.css';
@@ -40,6 +40,9 @@ export default function AddContact() {
 
     return (
         <Grid container direction="column">
+            <Grid item sx={{ bgcolor: '#333', pt: 3, display: 'flex', justifyContent: 'center' }}>
+                <Typography variant='h4' style={{ color: '#fff' }}>Add Contact</Typography>
+            </Grid>
             <Grid item sx={{ bgcolor: '#333', p: '1rem', display: 'flex', justifyContent: 'center' }}>
                 <TextField
                     fullWidth

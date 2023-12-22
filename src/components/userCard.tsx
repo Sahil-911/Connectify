@@ -19,7 +19,7 @@ const UserCard = ({ profileDetails }: { profileDetails: UserInput }) => {
 
     return (
         <>
-            <Card style={{ margin: '30px', backgroundColor: '#232323', color: 'white', width: '300px' }}>
+            <Card elevation={1} style={{ margin: '30px', backgroundColor: '#232323', color: 'white', width: '300px' }}>
                 <CardContent style={{ textAlign: 'center' }}>
                     {/* Profile Picture */}
                     <Avatar alt="Profile Picture" src='/profile_pic.png' style={{ width: '100px', height: '100px', margin: 'auto' }} />
