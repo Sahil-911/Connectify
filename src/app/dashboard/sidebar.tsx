@@ -48,15 +48,15 @@ const Sidebar = () => {
 
     const sidebarItemsTops = [
         { icon: <Forum style={{ color: 'white' }} />, text: 'Chats', route: '' },
-        { icon: <Diversity3 style={{ color: 'white' }} />, text: 'Groups', route: 'groups' },
+        // { icon: <Diversity3 style={{ color: 'white' }} />, text: 'Groups', route: 'groups' },
         { icon: <PersonAdd style={{ color: 'white' }} />, text: 'Add Friend', route: 'addContact' },
-        { icon: <GroupAdd style={{ color: 'white' }} />, text: 'Create Group', route: 'createGroup' },
+        // { icon: <GroupAdd style={{ color: 'white' }} />, text: 'Create Group', route: 'createGroup' },
         { icon: <Person style={{ color: 'white' }} />, text: 'Profile', route: 'profile' },
         { icon: <PendingActions style={{ color: 'white' }} />, text: 'Manage Connections', route: 'manageConnections' }
     ];
 
     const sidebarItemsBottoms = [
-        { icon: <Settings style={{ color: 'white' }} />, text: 'Settings', route: 'settings' },
+        // { icon: <Settings style={{ color: 'white' }} />, text: 'Settings', route: 'settings' },
         { icon: <Logout style={{ color: 'white' }} />, text: 'Logout', route: 'Logout' },
     ];
 

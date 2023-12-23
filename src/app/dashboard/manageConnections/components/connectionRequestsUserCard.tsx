@@ -15,17 +15,6 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
     const [openModal, setOpenModal] = useState(false);
     const [which, setWhich] = useState('noone');
 
-    // useEffect(() => {
-    //     // Check if profileDetails._id is present in the currentUser's connectionRequests array
-    //     if (currentUser && currentUser.connectionRequests?.includes(profileDetails._id as any)) {
-    //         console.log('req')
-    //         setConnectionStatus('Accept');
-    //     } else {
-    //         console.log('con')
-    //         setConnectionStatus('Reject');
-    //     }
-    // }, [currentUser, profileDetails._id]);
-
     const handleOpenModal = () => {
         setOpenModal(true);
     };
@@ -33,34 +22,6 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
     const handleCloseModal = () => {
         setOpenModal(false);
     };
-
-    // const handleConnect = async () => {
-    //     try {
-    //         if (connectionStatus === 'Accept') {
-    //             // Make API call to connect
-    //             console.log('Connecting to: ', profileDetails._id);
-    //             if (currentUser) {
-    //                 const response = await RemoveConnection(session, profileDetails._id);
-    //                 console.log(response);
-    //                 if (response.message.message === 'Connected successfully') {
-    //                     setWhich('Accepted');
-    //                 }
-    //             }
-    //         } else if (connectionStatus === 'Reject') {
-    //             // Make API call to disconnect
-    //             console.log('Rejecting: ', profileDetails._id);
-    //             if (currentUser) {
-    //                 const response = await ConnectById(session, profileDetails._id);
-    //                 console.log(response);
-    //                 if (response.message.message === 'Withdrawal Completed') {
-    //                     setWhich('Rejected');
-    //                 }
-    //             }
-    //         }
-    //     } catch (error) {
-    //         console.error('Error:', error as any);
-    //     }
-    // };
 
     const handleAccept = async () => {
         try {
@@ -126,7 +87,7 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
                             </>
                         )}
                         {which !== 'noone' && (
-                            <Typography variant='body1'>
+                            <Typography variant='body1' sx={{ my: 1.1 }}>
                                 {which}
                             </Typography>
                         )}

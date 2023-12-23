@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { connectByIdRequest, disconnectByIdWithdrawal } from "@/server/services/user.service";
+import { connectByIdRequest, disconnectByIdWithdrawal, getNameOfConnections } from "@/server/services/user.service";
 
 export async function ConnectById(session: SessionInterface, id: string) {
     console.log('connecting...', id);
@@ -29,6 +29,21 @@ export async function DisconnectById(session: SessionInterface, id: string) {
         const message = await disconnectByIdWithdrawal(userId, id);
         console.log('dissconnected hehe');
         return { message: message };
+    }
+    catch (err: any) {
+        console.log('error', err.message)
+        return { message: err.message }
+    }
+}
+
+export async function GetNameOfConnections(session: SessionInterface) {
+    console.log('getting names of connections...');
+    try {
+        const { id: userId } = verifyToken(session);
+        if (!userId) throw new Error('Invalid token');
+        const contacts = await getNameOfConnections(userId);
+        console.log('contacts');
+        return {contacts , message: 'contacts fetched successfully'};
     }
     catch (err: any) {
         console.log('error', err.message)

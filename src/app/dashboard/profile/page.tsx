@@ -156,9 +156,9 @@ const Profile = () => {
                             </Grid>
                             <Grid item xs={12} sm>
                                 <div style={{}}>
-                                    <Typography variant="h3" sx={{ mx: 1, mt: 2, mb: 2 }}>{profileDetails.username}</Typography>
+                                    <Typography variant="h3" sx={{ mx: 1, mt: 2, mb: 2 }}>{profileDetails.name}</Typography>
                                     <Divider sx={{ backgroundColor: '#333', my: 1 }} />
-                                    <Typography variant="h4" sx={{ mx: 1, mb: 1 }}>{profileDetails.name}</Typography>
+                                    <Typography variant="h4" sx={{ mx: 1, mb: 1, color: '#007bff' }}>@{profileDetails.username}</Typography>
                                     <Divider sx={{ backgroundColor: '#333', my: 1 }} />
                                     <Typography variant="h4" sx={{ mx: 1, mb: 1 }}>{profileDetails.email}</Typography>
                                 </div>
@@ -179,6 +179,11 @@ const Profile = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                                 <Typography variant="h5">Number of Pending Requests: </Typography>
                                 <Typography variant="h5">{profileDetails.pendingConnections?.length || 0}</Typography>
+                            </div>
+                            <Divider variant='middle' sx={{ backgroundColor: '#333', my: 1 }} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                <Typography variant="h5">Number of Connection Requests: </Typography>
+                                <Typography variant="h5">{profileDetails.connectionRequests?.length || 0}</Typography>
                             </div>
                         </div>
                         <Divider variant='fullWidth' sx={{ backgroundColor: '#333', my: 3 }} />

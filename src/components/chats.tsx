@@ -5,8 +5,12 @@ import React from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import styles from './scroll.module.css';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import Image from 'next/image';
 
-function Chats() {
+function Chats({ selectedContact }: { selectedContact: { _id: string, name: string, username: string } }) {
+
+  console.log(selectedContact, 'le');
+
   const handleSubmit = () => {
     // e.preventDefault();
     // Handle form submission here
@@ -27,42 +31,42 @@ function Chats() {
       sender: 'Jane Smith',
       timestamp: '2021-10-10T12:00:00.000Z',
     },
-    {
-      id: 3,
-      text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
-      sender: 'Jane Smith',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 4,
-      text: 'That is good to hear!',
-      sender: 'John Doe',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 1,
-      text: 'Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? ',
-      sender: 'John Doe',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 2,
-      text: 'I am doing well, thanks for asking!',
-      sender: 'Jane Smith',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 3,
-      text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
-      sender: 'Jane Smith',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 4,
-      text: 'That is good to hear!',
-      sender: 'John Doe',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
+    // {
+    //   id: 3,
+    //   text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
+    //   sender: 'Jane Smith',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
+    // {
+    //   id: 4,
+    //   text: 'That is good to hear!',
+    //   sender: 'John Doe',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
+    // {
+    //   id: 1,
+    //   text: 'Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? ',
+    //   sender: 'John Doe',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
+    // {
+    //   id: 2,
+    //   text: 'I am doing well, thanks for asking!',
+    //   sender: 'Jane Smith',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
+    // {
+    //   id: 3,
+    //   text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
+    //   sender: 'Jane Smith',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
+    // {
+    //   id: 4,
+    //   text: 'That is good to hear!',
+    //   sender: 'John Doe',
+    //   timestamp: '2021-10-10T12:00:00.000Z',
+    // },
   ];
 
   return (
@@ -78,10 +82,28 @@ function Chats() {
       height: '100%',
 
     }}>
-      <Typography variant="h5" sx={{ my: 2, ml: 1.5, color: 'white' }}>Chats</Typography>
+      <div style={{ display: 'flex', alignItems: 'flex-start', height: '64px'}}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height:'100%', marginLeft:'10px' }}>
+          <Image
+            src='/profile_pic.png' // Use the avatar property from contact
+            alt={selectedContact?.name}
+            width={45}
+            height={45}
+            style={{ borderRadius: '50%' }}
+          />
+        </div>
+        <div style={{ padding: '4px', width: '100%', minHeight: '64px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Typography variant="body1" sx={{ ml: 1.5, mt: 0, color: '#fff' }}>
+            {selectedContact?.name}
+          </Typography>
+          <Typography variant="caption" sx={{ ml: 1.5, mt: 0, color: '#007bff' }}>
+            {selectedContact.username !== '' && `@${selectedContact.username}`}
+          </Typography>
+        </div>
+      </div>
       <Divider />
       <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
-        {messages.map((message) => (
+        {messages && messages.map((message) => (
           <div
             key={message.id}
             style={{
