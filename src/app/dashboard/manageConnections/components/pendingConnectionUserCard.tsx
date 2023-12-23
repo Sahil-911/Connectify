@@ -2,22 +2,23 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Button, Avatar, Grid, Divider } from '@mui/material';
-import UserDetailsModal from './UserDetailsModal';
+import UserDetailsModal from '@/components/UserDetailsModal';
 import { UserInputWithId } from '@/types/User.interface';
-import { ConnectById, DisconnectById } from './action';
 import { useAuth } from '@/context/session';
+import { ConnectById } from '@/components/action';
+import { ConnectByIdRequest, WithdrawPendingConnection } from './action';
 
-const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWithId, currentUser: UserInputWithId | null }) => {
+const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWithId, currentUser: UserInputWithId }) => {
 
     const { session } = useAuth();
 
-    // console.log(currentUser);
-
     const [openModal, setOpenModal] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState<'Connect' | 'Requested' | 'Withdraw'>('Connect');
+    const [connectionStatus, setConnectionStatus] = useState<'Withdraw' | 'Requested' | 'Connect'>('Withdraw');
 
     useEffect(() => {
-        // Check if profileDetails._id is present in the currentUser's connectionRequests
+        console.log(profileDetails._id, 'a');
+        console.log(currentUser?.pendingConnections, 'b');
+        // Check if profileDetails._id is present in the currentUser's connectionRequests array
         if (currentUser && currentUser.pendingConnections?.includes(profileDetails._id as any)) {
             console.log('req')
             setConnectionStatus('Withdraw');
@@ -37,27 +38,27 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
 
     const handleConnect = async () => {
         try {
-            if (connectionStatus === 'Connect') {
+            if (connectionStatus === 'Withdraw') {
                 // Make API call to connect
+                console.log('withdrawal from: ', profileDetails._id);
+                if (currentUser) {
+                    const response = await WithdrawPendingConnection(session, profileDetails._id);
+                    console.log(response);
+                    if (response.message.message === 'Withdrawal Completed') {
+                        setConnectionStatus('Connect');
+                    }
+                }
+            } else if (connectionStatus === 'Connect') {
+                // Make API call to disconnect
                 console.log('Connecting to:', profileDetails._id);
                 if (currentUser) {
-                    const response = await ConnectById(session, profileDetails._id);
+                    const response = await ConnectByIdRequest(session, profileDetails._id);
                     console.log(response);
                     if (response.message.message === 'Connected successfully') {
                         setConnectionStatus('Requested');
                         setTimeout(() => {
-                            setConnectionStatus('Withdraw')
-                        }, 1000);
-                    }
-                }
-            } else if (connectionStatus === 'Withdraw') {
-                // Make API call to disconnect
-                console.log('Disconnecting from:', profileDetails._id);
-                if (currentUser) {
-                    const response = await DisconnectById(session, profileDetails._id);
-                    console.log(response);
-                    if (response.message.message === 'Withdrawal Completed') {
-                        setConnectionStatus('Connect');
+                            setConnectionStatus('Withdraw');
+                        }, 1000)
                     }
                 }
             }

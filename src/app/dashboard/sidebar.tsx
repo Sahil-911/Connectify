@@ -16,6 +16,7 @@ import {
     GroupAdd,
     Forum,
     Diversity3,
+    PendingActions,
 } from '@mui/icons-material';
 import { useAuth } from '@/context/session';
 import { useRouter } from 'next/navigation';
@@ -51,6 +52,7 @@ const Sidebar = () => {
         { icon: <PersonAdd style={{ color: 'white' }} />, text: 'Add Friend', route: 'addContact' },
         { icon: <GroupAdd style={{ color: 'white' }} />, text: 'Create Group', route: 'createGroup' },
         { icon: <Person style={{ color: 'white' }} />, text: 'Profile', route: 'profile' },
+        { icon: <PendingActions style={{ color: 'white' }} />, text: 'Manage Connections', route: 'manageConnections' }
     ];
 
     const sidebarItemsBottoms = [

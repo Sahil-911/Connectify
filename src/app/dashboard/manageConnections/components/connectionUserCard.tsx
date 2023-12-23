@@ -2,24 +2,25 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Button, Avatar, Grid, Divider } from '@mui/material';
-import UserDetailsModal from './UserDetailsModal';
+import UserDetailsModal from '@/components/UserDetailsModal';
 import { UserInputWithId } from '@/types/User.interface';
-import { ConnectById, DisconnectById } from './action';
 import { useAuth } from '@/context/session';
+import { ConnectById } from '@/components/action';
+import { ConnectByIdRequest, DisconnectById, RemoveFriend } from './action';
 
 const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWithId, currentUser: UserInputWithId | null }) => {
 
     const { session } = useAuth();
 
-    // console.log(currentUser);
-
     const [openModal, setOpenModal] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState<'Connect' | 'Requested' | 'Withdraw'>('Connect');
+    const [connectionStatus, setConnectionStatus] = useState<'Remove' | 'Removed' | 'Connect' | 'Requested' | 'Withdraw'>('Remove');
 
     useEffect(() => {
-        // Check if profileDetails._id is present in the currentUser's connectionRequests
-        if (currentUser && currentUser.pendingConnections?.includes(profileDetails._id as any)) {
+        // Check if profileDetails._id is present in the currentUser's connectionRequests array
+        if (currentUser && currentUser.connections?.includes(profileDetails._id as any)) {
             console.log('req')
+            setConnectionStatus('Remove');
+        } else if (currentUser && currentUser.pendingConnections?.includes(profileDetails._id as any)) {
             setConnectionStatus('Withdraw');
         } else {
             console.log('con')
@@ -37,22 +38,34 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
 
     const handleConnect = async () => {
         try {
-            if (connectionStatus === 'Connect') {
+            if (connectionStatus === 'Remove') {
                 // Make API call to connect
-                console.log('Connecting to:', profileDetails._id);
+                console.log('Removing:', profileDetails._id);
                 if (currentUser) {
-                    const response = await ConnectById(session, profileDetails._id);
+                    const response = await RemoveFriend(session, profileDetails._id);
+                    console.log(response);
+                    if (response.message.message === 'Friend Removed') {
+                        setConnectionStatus('Removed');
+                        setTimeout(() => {
+                            setConnectionStatus('Connect');
+                        }, 1000);
+                    }
+                }
+            } else if (connectionStatus === 'Connect') {
+                // Make API call to disconnect
+                console.log('connect tooooooooo:', profileDetails._id);
+                if (currentUser) {
+                    const response = await ConnectByIdRequest(session, profileDetails._id);
                     console.log(response);
                     if (response.message.message === 'Connected successfully') {
                         setConnectionStatus('Requested');
                         setTimeout(() => {
-                            setConnectionStatus('Withdraw')
+                            setConnectionStatus('Withdraw');
                         }, 1000);
                     }
                 }
             } else if (connectionStatus === 'Withdraw') {
-                // Make API call to disconnect
-                console.log('Disconnecting from:', profileDetails._id);
+                console.log('withdrawal from: ', profileDetails._id);
                 if (currentUser) {
                     const response = await DisconnectById(session, profileDetails._id);
                     console.log(response);
@@ -81,7 +94,7 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
                     </Button>
                     <Button
                         variant="contained"
-                        sx={{ bgcolor: connectionStatus === 'Withdraw' ? 'orange' : connectionStatus === 'Connect' ? 'green' : '#007bff', mt: 1, ml: 2 }}
+                        sx={{ bgcolor: connectionStatus === 'Remove' ? 'red' : connectionStatus === 'Connect' ? 'green' : connectionStatus === 'Withdraw' ? 'orange' : '#007bff', mt: 1, ml: 2 }}
                         onClick={handleConnect}
                     >
                         {connectionStatus}

@@ -1,8 +1,7 @@
 import { UserModel } from '@/server/models/User.model';
-import { UserInput, User } from '@/types/User.interface';
+import { UserInput, UserInputWithId } from '@/types/User.interface';
 import bcrypt from 'bcrypt';
-import { Document, ObjectId } from 'mongoose';
-import { Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 export const createUser = async (user: UserInput) => {
     console.log('we are in createUser');
@@ -35,8 +34,8 @@ export const getUserById = async ({ id }: { id: string }) => {
             email: user?.email,
             bio: user?.bio,
             gender: user?.gender,
-            connection: user?.connections,
-            pendingConnection: user?.pendingConnections,
+            connections: user?.connections,
+            pendingConnections: user?.pendingConnections,
             connectionRequests: user?.connectionRequests
         }
     } else {
@@ -48,7 +47,16 @@ export const updateUserById = async (id: string, user: UserInput) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const updatedUser = await UserModel.findByIdAndUpdate(id, user);
-        return castDocumentToUser(updatedUser);
+        return {
+            name: updatedUser?.name,
+            username: updatedUser?.username,
+            email: updatedUser?.email,
+            bio: updatedUser?.bio,
+            gender: updatedUser?.gender,
+            connections: updatedUser?.connections,
+            pendingConnections: updatedUser?.pendingConnections,
+            connectionRequests: updatedUser?.connectionRequests
+        }
     } else {
         throw new Error('User not found');
     }
@@ -82,23 +90,23 @@ export const connectByIdRequest = async (userId: string, id: string) => {
     const user2 = await UserModel.findById({ _id: id });
     if (user2) console.log('yes user2');
     if (user2Exists) {
-        if (user1 && user1.connectionRequests?.includes(new Types.ObjectId(id) as any)) {
+        if (user1 && user1.pendingConnections?.includes(id as any)) {
             console.log('Already');
             throw new Error('Already requested');
         }
-        else if (user2 && user2.pendingConnections?.includes(new Types.ObjectId(userId) as any)) {
+        else if (user2 && user2.connectionRequests?.includes(userId as any)) {
             console.log('requested');
             throw new Error('Already requested');
         }
         else {
             if (user1) {
-                user1.connectionRequests = user1.connectionRequests || [];
-                user1.connectionRequests.push(new Types.ObjectId(id) as any);
+                user1.pendingConnections = user1.pendingConnections || [];
+                user1.pendingConnections.push(id as any);
                 await user1.save();
             }
             if (user2) {
-                user2.pendingConnections = user2.pendingConnections || [];
-                user2.pendingConnections.push(new Types.ObjectId(userId) as any);
+                user2.connectionRequests = user2.connectionRequests || [];
+                user2.connectionRequests.push(userId as any);
                 await user2.save();
             }
             console.log(user1, user2);
@@ -116,15 +124,15 @@ export const disconnectByIdWithdrawal = async (userId: string, id: string) => {
     const user1 = await UserModel.findById({ _id: userId });
     const user2 = await UserModel.findById({ _id: id });
     if (user2Exists) {
-        if (user1 && user1.connectionRequests?.includes(new Types.ObjectId(id) as any)) {
-            const objectId1 = new Types.ObjectId(userId);
-            const objectId2 = new Types.ObjectId(id);
+        if (user1 && user1.pendingConnections?.includes(id as any)) {
+            const objectId1 = userId;
+            const objectId2 = id;
             if (user1) {
-                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== objectId2.toString());
+                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== objectId2.toString());
                 await user1.save();
             }
             if (user2) {
-                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== objectId1.toString());
+                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== objectId1.toString());
                 await user2.save();
             }
             console.log(user1, user2);
@@ -137,15 +145,227 @@ export const disconnectByIdWithdrawal = async (userId: string, id: string) => {
     }
 }
 
+export const getAllNewUsers = async (userId: string) => {
+    try {
+        // Find the user by ID
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const connections = user.connections || [];
+        const pendingConnections = user.pendingConnections || [];
+        const connectionRequests = user.connectionRequests || [];
+
+        // Fetch all users from the database where their IDs are not in connections, pendingConnections, or connectionRequests of the given user
+        const newUsers = await UserModel.find({
+            _id: {
+                $nin: [
+                    ...connections.map(conn => conn._id),
+                    ...pendingConnections.map(pendingConn => pendingConn._id),
+                    ...connectionRequests.map(req => req._id),
+                    userId
+                ]
+            }
+        });
+
+        return newUsers;
+    } catch (error: any) {
+        throw new Error('Error fetching new users: ' + error.message);
+    }
+};
+
+export const getAllConnections = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId).populate('connections');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const connections = user.connections || [];
+        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+
+        const formattedConnections = connectedUsers.map((connectedUser: any) => ({
+            _id: connectedUser._id,
+            name: connectedUser.name,
+            username: connectedUser.username,
+            email: connectedUser.email,
+            password: '',
+            bio: connectedUser.bio,
+            gender: connectedUser.gender,
+            connections: connectedUser.connections,
+            pendingConnections: connectedUser.pendingConnections,
+            connectionRequests: connectedUser.connectionRequests
+        }));
+
+        return { connections: formattedConnections };
+    } catch (error: any) {
+        throw new Error('Error fetching connections: ' + error.message);
+    }
+};
+
+export const getAllPendingConnections = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId).populate('pendingConnections');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const pendingConnections = user.pendingConnections || [];
+        const pendingUsers = await UserModel.find({ _id: { $in: pendingConnections.map(pen => pen._id) } });
+
+        const formattedPendingConnections = pendingUsers.map((pendingUser: any) => ({
+            _id: pendingUser._id,
+            name: pendingUser.name,
+            username: pendingUser.username,
+            email: pendingUser.email,
+            password: '',
+            bio: pendingUser.bio,
+            gender: pendingUser.gender,
+            connections: pendingUser.connections,
+            pendingConnections: pendingUser.pendingConnections,
+            connectionRequests: pendingUser.connectionRequests
+        }));
+
+        return { pendingConnections: formattedPendingConnections };
+    } catch (error: any) {
+        throw new Error('Error fetching pendingConnections: ' + error.message);
+    }
+};
+
+export const getAllConnectionRequests = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId).populate('connectionRequests');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const connectionRequests = user.connectionRequests || [];
+        const requests = await UserModel.find({ _id: { $in: connectionRequests.map(pen => pen._id) } });
+
+        const formattedConnectionRequests = requests.map((request: any) => ({
+            _id: request._id,
+            name: request.name,
+            username: request.username,
+            email: request.email,
+            password: '',
+            bio: request.bio,
+            gender: request.gender,
+            connections: request.connections,
+            pendingConnections: request.pendingConnections,
+            connectionRequests: request.connectionRequests
+        }));
+
+        return { connectionRequests: formattedConnectionRequests };
+    } catch (error: any) {
+        throw new Error('Error fetching connectionRequests: ' + error.message);
+    }
+}
+
+export const acceptRequest = async (userId: string, id: string) => {
+    console.log('service', userId, id);
+    const user2Exists = await UserModel.exists({ _id: id });
+    if (user2Exists) console.log('le');
+    const user1 = await UserModel.findById({ _id: userId });
+    if (user1) console.log('yes user1');
+    const user2 = await UserModel.findById({ _id: id });
+    if (user2) console.log('yes user2');
+    if (user2Exists) {
+        if (user1 && user1.connections?.includes(id as any)) {
+            console.log('Already');
+            throw new Error('Already Connected');
+        }
+        else if (user2 && user2.connections?.includes(userId as any)) {
+            console.log('Connected');
+            throw new Error('Already Connected');
+        }
+        else {
+            if (user1) {
+                user1.connections = user1.connections || [];
+                user1.connections.push(id as any);
+                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
+                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== id);
+                await user1.save();
+            }
+            if (user2) {
+                user2.connectionRequests = user2.connectionRequests || [];
+                user2.connectionRequests.push(userId as any);
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
+                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== userId);
+                await user2.save();
+            }
+            console.log(user1, user2);
+            return { message: 'Connected successfully' };
+        }
+    }
+    else {
+        console.log('hu vaat kare');
+        throw new Error('User not found');
+    }
+}
+
+export const rejectRequest = async (userId: string, id: string) => {
+    const user2Exists = await UserModel.exists({ _id: id });
+    const user1 = await UserModel.findById({ _id: userId });
+    const user2 = await UserModel.findById({ _id: id });
+    if (user2Exists) {
+        if (user1 && user1.connectionRequests?.includes(id as any)) {
+            if (user1) {
+                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
+                await user1.save();
+            }
+            if (user2) {
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
+                await user2.save();
+            }
+            console.log(user1, user2);
+            return { message: 'Request Rejected' };
+        } else {
+            throw new Error('Not connected');
+        }
+    } else {
+        throw new Error('User not found');
+    }
+}
+
+export const removeFriend = async (userId: string, id: string) => {
+    const user2Exists = await UserModel.exists({ _id: id });
+    const user1 = await UserModel.findById({ _id: userId });
+    const user2 = await UserModel.findById({ _id: id });
+    if (user2Exists) {
+        if (user1 && user1.connections?.includes(id as any)) {
+            if (user1) {
+                user1.connections = user1.connections?.filter((connection) => connection.toString() !== id);
+                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== id);
+                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
+                await user1.save();
+            }
+            if (user2) {
+                user2.connections = user2.connections?.filter((connection) => connection.toString() !== userId);
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
+                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== userId);
+                await user2.save();
+            }
+            console.log(user1, user2);
+            return { message: 'Friend Removed' };
+        } else {
+            throw new Error('Not connected');
+        }
+    } else {
+        throw new Error('User not found');
+    }
+}
+
 function castDocumentToUser(
-    user: (Document<unknown, {}, UserInput> & UserInput & {
-        _id: Types.ObjectId;
-    }) | null
+    user: (Document<unknown, {}, UserInputWithId>) | null
 ) {
     if (user instanceof Document) {
         return user.toJSON();
     } else {
-        return null; // or handle the case when user is null or doesn't contain a toJSON method
+        return null;
     }
 }
-

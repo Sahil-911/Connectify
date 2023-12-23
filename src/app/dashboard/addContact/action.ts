@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { getAllUsers, getUserById } from "@/server/services/user.service";
+import { getAllNewUsers, getAllUsers, getUserById } from "@/server/services/user.service";
 
 export async function FetchProfile(session: SessionInterface) {
     console.log(session);
@@ -18,11 +18,12 @@ export async function FetchProfile(session: SessionInterface) {
     }
 }
 
+// get profiles that is not connected or pending or requested
 export async function GetAllProfiles(session: SessionInterface) {
     try {
         const { id } = verifyToken(session);
         if (!id) throw new Error('Invalid token');
-        const profiles = await getAllUsers();
+        const profiles = await getAllNewUsers(id);
         if (profiles)
             return { profiles, message: 'profiles fetched successfully' };
     }

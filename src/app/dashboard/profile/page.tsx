@@ -5,7 +5,7 @@ import { Typography, Avatar, Paper, Divider, Grid, Button, TextField } from '@mu
 import { FetchProfile, UpdateProfile } from './action';
 import { useAuth } from '@/context/session';
 import { useRouter } from 'next/navigation';
-import { UserInput } from '@/types/User.interface';
+import { UserInputWithId } from '@/types/User.interface';
 import styles from '@/components/scroll.module.css'; // Import the CSS module
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -14,7 +14,7 @@ const Profile = () => {
     const { session } = useAuth();
     const router = useRouter();
 
-    const [profileDetails, setProfileDetails] = useState<UserInput | null>(null);
+    const [profileDetails, setProfileDetails] = useState<UserInputWithId | null>(null);
     const [update, setUpdate] = useState(false);
 
     useEffect(() => {
@@ -65,7 +65,15 @@ const Profile = () => {
                     // router.push("/login");
                 } else {
                     console.log(updatedProfile);
-                    setProfileDetails(updatedProfile);
+                    setProfileDetails({
+                        _id: profileDetails?._id || '',
+                        password: profileDetails?.password || '',
+                        name: updatedProfile.name || '',
+                        username: updatedProfile.username || '',
+                        email: updatedProfile.email || '',
+                        gender: updatedProfile.gender || '',
+                        bio: updatedProfile.bio
+                    });
                 }
             });
 
@@ -107,7 +115,15 @@ const Profile = () => {
                 // router.push("/login");
             } else {
                 console.log(updatedProfile);
-                setProfileDetails(updatedProfile);
+                setProfileDetails({
+                    _id: profileDetails?._id || '',
+                    password: profileDetails?.password || '',
+                    name: updatedProfile.name || '',
+                    username: updatedProfile.username || '',
+                    email: updatedProfile.email || '',
+                    gender: updatedProfile.gender || '',
+                    bio: updatedProfile.bio
+                });
 
                 // Fetch updated profile data after successful update
                 FetchProfile(session).then((response) => {

@@ -1,7 +1,4 @@
-import { ObjectId } from 'mongoose';
-
 export interface UserInput {
-    // _id?: string | ObjectId;
     name: string;
     username: string;
     email: string;
@@ -13,4 +10,8 @@ export interface UserInput {
     connectionRequests?: User[];
 }
 
-export type User = UserInput;
+export interface UserInputWithId extends UserInput {
+    _id: string;
+}
+
+export type User = UserInputWithId;

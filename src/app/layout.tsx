@@ -32,8 +32,8 @@ export default function RootLayout({
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <SessionProvider>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ flex: 1, backgroundColor:'#1f1f1f' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', borderRadius: '6px 0 0 0' }}>
+              <div style={{ flex: 1, backgroundColor: '#1f1f1f', borderRadius: '6px 0 0 0' }}>
                 {children}
               </div>
             </div>
