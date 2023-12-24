@@ -1,8 +1,8 @@
-import { Schema } from 'mongoose';
-import { contactInput } from '@/types/Contact.interface';
+import { Model, Schema, models } from 'mongoose';
+import { contact, contactInputWithId } from '@/types/Contact.interface';
 import { model } from 'mongoose';
 
-const contactSchema = new Schema<contactInput>({
+const contactSchema = new Schema<contactInputWithId>({
     from: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -27,4 +27,4 @@ const contactSchema = new Schema<contactInput>({
     ],
 });
 
-export const ContactModel = model<contactInput>("Contact", contactSchema);
+export const ContactModel: Model<contact> = models["Contact"] ?? model<contact>("Contact", contactSchema);

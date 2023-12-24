@@ -48,7 +48,7 @@ const Contacts = ({ onSelectContact }: { onSelectContact: (contact: { _id: strin
                             cursor: 'pointer',
                         }}
                     >
-                        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '10px', height: '70px', margin: '5px 0 5px 0' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '10px', minHeight: '70px', margin: '5px 0 5px 0' }}>
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                 <Image
                                     src='/profile_pic.png' // Use the avatar property from contact
@@ -65,7 +65,6 @@ const Contacts = ({ onSelectContact }: { onSelectContact: (contact: { _id: strin
                                 <Typography variant="caption" sx={{ ml: 2, my: 'auto', color: '#007bff' }}>
                                     @{contact.username}
                                 </Typography>
-
                             </div>
                         </div>
                     </Paper>

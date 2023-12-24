@@ -1,74 +1,61 @@
 'use client';
 
 import { Divider, TextField, Typography, IconButton } from '@mui/material';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import styles from './scroll.module.css';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import Image from 'next/image';
+import { useAuth } from '@/context/session';
+import { UserInputWithId } from '@/types/User.interface';
+import { FetchProfile, GetMessagesUser1User2, StoreNewMessageInContact } from './action';
+import { MessageInputWithId } from '@/types/Message.interface';
 
-function Chats({ selectedContact }: { selectedContact: { _id: string, name: string, username: string } }) {
+function Chats({ selectedContact, profile }: { selectedContact: { _id: string, name: string, username: string }, profile: UserInputWithId }) {
 
-  console.log(selectedContact, 'le');
+  const { session } = useAuth();
 
-  const handleSubmit = () => {
-    // e.preventDefault();
-    // Handle form submission here
-    console.log('Message sent!');
-    // You can add logic to send the message to a backend or perform other actions
+  console.log(selectedContact);
+
+  const [messages, setMessages] = useState<MessageInputWithId[]>([]);
+  const [newMessageContent, setNewMessageContent] = useState<string>('');
+
+  useEffect(() => {
+    GetMessagesUser1User2(session, selectedContact._id).then((response) => {
+      console.log(response);
+
+      console.log('chats fetched', response);
+      const fetchedMessages = response.chats;
+      setMessages(fetchedMessages || []);
+    })
+  }, [session, selectedContact]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessageContent(event.target.value); // Update the state with the content of the input field
   };
 
-  const messages = [
-    {
-      id: 1,
-      text: 'Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? ',
-      sender: 'John Doe',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    {
-      id: 2,
-      text: 'I am doing well, thanks for asking!',
-      sender: 'Jane Smith',
-      timestamp: '2021-10-10T12:00:00.000Z',
-    },
-    // {
-    //   id: 3,
-    //   text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
-    //   sender: 'Jane Smith',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-    // {
-    //   id: 4,
-    //   text: 'That is good to hear!',
-    //   sender: 'John Doe',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-    // {
-    //   id: 1,
-    //   text: 'Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? Hello, how are you? ',
-    //   sender: 'John Doe',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-    // {
-    //   id: 2,
-    //   text: 'I am doing well, thanks for asking!',
-    //   sender: 'Jane Smith',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-    // {
-    //   id: 3,
-    //   text: 'I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! I am doing well, thanks for asking! ',
-    //   sender: 'Jane Smith',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-    // {
-    //   id: 4,
-    //   text: 'That is good to hear!',
-    //   sender: 'John Doe',
-    //   timestamp: '2021-10-10T12:00:00.000Z',
-    // },
-  ];
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
+    // Send message using the content from the state variable
+    await StoreNewMessageInContact(session, selectedContact._id, newMessageContent);
+
+    // Clear input field after sending the message
+    setNewMessageContent('');
+
+    // Update messages
+    GetMessagesUser1User2(session, selectedContact._id).then((response) => {
+      console.log(response);
+
+      console.log('chats fetched', response);
+      const fetchedMessages = response.chats;
+      // console.log(fetchedMessages,'ogogogo');
+      setMessages(fetchedMessages || []);
+    })
+  };
+
+  console.log(selectedContact._id, 's');
+  console.log(profile, 'p');
   return (
     <div style={{
       backgroundColor: '#262626',
@@ -82,8 +69,8 @@ function Chats({ selectedContact }: { selectedContact: { _id: string, name: stri
       height: '100%',
 
     }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', height: '64px'}}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height:'100%', marginLeft:'10px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', height: '64px' }}>
+        {selectedContact.username !== '' && (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', marginLeft: '10px' }}>
           <Image
             src='/profile_pic.png' // Use the avatar property from contact
             alt={selectedContact?.name}
@@ -91,7 +78,7 @@ function Chats({ selectedContact }: { selectedContact: { _id: string, name: stri
             height={45}
             style={{ borderRadius: '50%' }}
           />
-        </div>
+        </div>)}
         <div style={{ padding: '4px', width: '100%', minHeight: '64px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <Typography variant="body1" sx={{ ml: 1.5, mt: 0, color: '#fff' }}>
             {selectedContact?.name}
@@ -105,24 +92,24 @@ function Chats({ selectedContact }: { selectedContact: { _id: string, name: stri
       <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
         {messages && messages.map((message) => (
           <div
-            key={message.id}
+            key={message._id}
             style={{
               display: 'flex', flexDirection: 'column',
-              alignItems: message.sender === 'John Doe' ? 'flex-end' : 'flex-start',
+              alignItems: message.sender.toString() === `${selectedContact._id}` ? 'flex-start' : 'flex-end',
               padding: '10px 15px',
               width: '100%',
             }}
           >
-            <Typography variant="subtitle2" sx={{ color: '#fff' }}>{message.sender}</Typography>
+            <Typography variant="subtitle2" sx={{ color: '#007bff' }}>{message?.sender?.toString() !== `${profile?._id}` ? selectedContact.username : message?.sender?.toString() !== `${selectedContact?._id}` ? profile?.username : ''} </Typography>
             <div style={{
-              backgroundColor: message.sender === 'John Doe' ? '#007bff' : '#333',
+              backgroundColor: message.sender.toString() === `${selectedContact._id}` ? '#333' : '#007bff',
               color: 'white',
               borderRadius: '10px',
               padding: '8px 12px',
               marginTop: '5px',
               maxWidth: '90%',
             }}>
-              <Typography variant="body1">{message.text}</Typography>
+              <Typography variant="body1">{message.content}</Typography>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Typography variant="caption" sx={{ color: 'lightgray', textAlign: 'right', fontStyle: 'italic' }}>{new Date(message.timestamp).toLocaleString()}</Typography>
               </div>
@@ -149,6 +136,9 @@ function Chats({ selectedContact }: { selectedContact: { _id: string, name: stri
               placeholder="Type your message"
               variant="outlined"
               size="small"
+              value={newMessageContent} // Set the value of the TextField to the state variable
+              onChange={handleInputChange} // Handle changes in the TextField 
+              required
               InputProps={{
                 style: {
                   backgroundColor: '#333',

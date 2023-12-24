@@ -1,12 +1,15 @@
-import { ObjectId } from "mongoose";
-import { User } from "./User.interface";
 import { Message } from "./Message.interface";
+import { User } from "./User.interface";
 
 export interface contactInput {
     from: User;
     to: User;
-    messagesfrom: Message[] | ObjectId[];
-    messagesto: Message[] | ObjectId[];
+    messagesfrom: Message[];
+    messagesto: Message[];
 }
 
-export type contact = contactInput & { _id: ObjectId };
+export interface contactInputWithId extends contactInput {
+    _id: string;
+}
+
+export type contact = contactInputWithId;

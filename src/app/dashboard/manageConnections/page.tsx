@@ -8,8 +8,8 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Connections from './connections';
 import styles from '@/components/scroll.module.css';
+import Connections from './connections';
 import PendingConnections from './pendingConnections';
 import ConnectionRequests from './connectionRequests';
 

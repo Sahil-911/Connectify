@@ -29,6 +29,7 @@ export const getUserById = async ({ id }: { id: string }) => {
     if (userExists) {
         const user = await UserModel.findById(id);
         return {
+            _id: user?._id,
             name: user?.name,
             username: user?.username,
             email: user?.email,

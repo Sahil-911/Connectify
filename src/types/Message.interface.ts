@@ -1,12 +1,13 @@
-import { ObjectId } from 'mongoose';
-import { User } from '@/types/User.interface';
+import { User } from "./User.interface";
 
 export interface MessageInput {
-    messageId: string;
     sender: User;
-    receiver: User;
     content: string;
     timestamp: Date;
+}
+
+export interface MessageInputWithId extends MessageInput {
+    _id: string;
 }
 
 export interface TextMessage extends MessageInput {
@@ -20,4 +21,4 @@ export interface ImageMessage extends MessageInput {
 
 export type MessageType = TextMessage | ImageMessage;
 
-export type Message = MessageType & { _id: ObjectId };
+export type Message = MessageInputWithId;
