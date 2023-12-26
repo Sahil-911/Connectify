@@ -1,3 +1,5 @@
+import { groupChat } from "./GroupChat.interface";
+
 export interface UserInput {
     name: string;
     username: string;
@@ -8,6 +10,7 @@ export interface UserInput {
     connections?: User[];
     pendingConnections?: User[];
     connectionRequests?: User[];
+    groupMemberOf?: groupChat[];
 }
 
 export interface UserInputWithId extends UserInput {

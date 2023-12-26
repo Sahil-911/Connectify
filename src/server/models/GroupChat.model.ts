@@ -1,15 +1,18 @@
-import { GroupChat } from '@/types/GroupChat.interface';
-import { Schema, model } from 'mongoose';
+import { GroupChatInputWithId, groupChat } from '@/types/GroupChat.interface';
+import { Model, Schema, model, models } from 'mongoose';
 
-const groupChatSchema = new Schema<GroupChat>({
-    chatId: {
-        type: String,
-        required: true,
-        unique: true,
-    },
+const groupChatSchema = new Schema<GroupChatInputWithId>({
     name: {
         type: String,
         required: true,
+    },
+    admin: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', // Reference to the User model
+        required: true,
+    },
+    description: {
+        type: String
     },
     participants: [
         {
@@ -24,16 +27,6 @@ const groupChatSchema = new Schema<GroupChat>({
             ref: 'Message', // Reference to the Message model
         },
     ],
-    createdAt: {
-        type: Date,
-        required: true,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        required: true,
-        default: Date.now,
-    },
 });
 
-export const GroupChatModel = model<GroupChat>('GroupChat', groupChatSchema);
+export const GroupChatModel: Model<groupChat> = models["GroupChat"] ?? model<groupChat>("GroupChat", groupChatSchema);

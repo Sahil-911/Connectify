@@ -39,6 +39,11 @@ const userSchema = new Schema<User>({
         type: Schema.Types.ObjectId,
         ref: 'User',
     }],
+    groupMemberOf: [{
+        type: Schema.Types.ObjectId,
+        ref: 'GroupChat',
+        required: true
+    }],
 });
 
 export const UserModel: Model<User> = models["User"] ?? model<User>("User", userSchema);

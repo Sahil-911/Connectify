@@ -8,7 +8,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import Image from 'next/image';
 import { useAuth } from '@/context/session';
 import { UserInputWithId } from '@/types/User.interface';
-import { FetchProfile, GetMessagesUser1User2, StoreNewMessageInContact } from './action';
+import { GetMessagesUser1User2, StoreNewMessageInContact } from './action';
 import { MessageInputWithId } from '@/types/Message.interface';
 
 function Chats({ selectedContact, profile }: { selectedContact: { _id: string, name: string, username: string }, profile: UserInputWithId }) {

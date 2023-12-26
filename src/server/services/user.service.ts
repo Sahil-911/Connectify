@@ -37,7 +37,8 @@ export const getUserById = async ({ id }: { id: string }) => {
             gender: user?.gender,
             connections: user?.connections,
             pendingConnections: user?.pendingConnections,
-            connectionRequests: user?.connectionRequests
+            connectionRequests: user?.connectionRequests,
+            groupMemberOf: user?.groupMemberOf
         }
     } else {
         throw new Error('User not found');
@@ -56,7 +57,8 @@ export const updateUserById = async (id: string, user: UserInput) => {
             gender: updatedUser?.gender,
             connections: updatedUser?.connections,
             pendingConnections: updatedUser?.pendingConnections,
-            connectionRequests: updatedUser?.connectionRequests
+            connectionRequests: updatedUser?.connectionRequests,
+            groupMemberOf: updatedUser?.groupMemberOf
         }
     } else {
         throw new Error('User not found');
@@ -198,7 +200,31 @@ export const getAllConnections = async (userId: string) => {
             gender: connectedUser.gender,
             connections: connectedUser.connections,
             pendingConnections: connectedUser.pendingConnections,
-            connectionRequests: connectedUser.connectionRequests
+            connectionRequests: connectedUser.connectionRequests,
+            groupMemberOf: connectedUser.groupMemberOf
+        }));
+
+        return { connections: formattedConnections };
+    } catch (error: any) {
+        throw new Error('Error fetching connections: ' + error.message);
+    }
+};
+
+export const getAllConnectionsNameId = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId).populate('connections');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const connections = user.connections || [];
+        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+
+        const formattedConnections = connectedUsers.map((connectedUser: any) => ({
+            _id: connectedUser._id,
+            name: connectedUser.name,
+            username: connectedUser.username
         }));
 
         return { connections: formattedConnections };
@@ -228,7 +254,8 @@ export const getAllPendingConnections = async (userId: string) => {
             gender: pendingUser.gender,
             connections: pendingUser.connections,
             pendingConnections: pendingUser.pendingConnections,
-            connectionRequests: pendingUser.connectionRequests
+            connectionRequests: pendingUser.connectionRequests,
+            groupMemberOf: pendingUser.groupMemberOf
         }));
 
         return { pendingConnections: formattedPendingConnections };
@@ -258,7 +285,8 @@ export const getAllConnectionRequests = async (userId: string) => {
             gender: request.gender,
             connections: request.connections,
             pendingConnections: request.pendingConnections,
-            connectionRequests: request.connectionRequests
+            connectionRequests: request.connectionRequests,
+            groupMemberOf: request.groupMemberOf
         }));
 
         return { connectionRequests: formattedConnectionRequests };

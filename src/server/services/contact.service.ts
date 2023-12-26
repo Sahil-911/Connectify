@@ -25,7 +25,6 @@ export const createContact = async (userId1: string, userId2: string) => {
     return newContact;
 }
 
-
 export const storeNewMessageInContact = async (userId1: string, userId2: string, messageContent: string) => {
     const contactExists = await getContactUser1User2(userId1, userId2);
 
@@ -33,7 +32,7 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
         const contact = await ContactModel.findById(contactExists).exec();
 
         // Create a new message
-        const newMessage = await createMessage(userId1, userId2, messageContent);
+        const newMessage = await createMessage(userId1, messageContent);
 
         if (contact?.from?.toString() === userId1?.toString()) {
             contact.messagesfrom.push(newMessage);
@@ -50,7 +49,7 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
         const newContact = await createContact(userId1, userId2);
 
         // Create a new message
-        const newMessage = await createMessage(userId1, userId2, messageContent );
+        const newMessage = await createMessage(userId1, messageContent);
 
         // Add the new message's ID to the new contact
         newContact.messagesfrom.push(newMessage);
