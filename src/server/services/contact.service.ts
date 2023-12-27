@@ -1,6 +1,7 @@
 import { ContactModel } from "../models/Contact.model";
 import { FilterQuery } from 'mongoose';
 import { createMessage } from "./message.service";
+import { MessageInputWithId } from "@/types/Message.interface";
 
 export const getContactUser1User2 = async (userId1: string, userId2: string) => {
     const query: FilterQuery<any> = {
@@ -35,10 +36,10 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
         const newMessage = await createMessage(userId1, messageContent);
 
         if (contact?.from?.toString() === userId1?.toString()) {
-            contact.messagesfrom.push(newMessage);
+            contact.messagesfrom.push(newMessage._id.toString() as string & MessageInputWithId); // Access the _id property of newMessage
             await contact?.save();
         } else if (contact?.to?.toString() === userId1?.toString()) {
-            contact?.messagesto.push(newMessage);
+            contact?.messagesto.push(newMessage._id as string & MessageInputWithId); // Access the _id property of newMessage
             await contact?.save();
         }
 
@@ -52,7 +53,7 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
         const newMessage = await createMessage(userId1, messageContent);
 
         // Add the new message's ID to the new contact
-        newContact.messagesfrom.push(newMessage);
+        newContact.messagesfrom.push(newMessage._id as string & MessageInputWithId);
         await newContact.save();
 
         return newMessage; // Return the newly created message if needed

@@ -36,7 +36,9 @@ export const getGroupNamesByUserId = async (userId: string) => {
                     }
                 })
             );
-            return groupNames.filter(Boolean); // Filtering out null values (error occurred for specific groups)
+            const filteredGroupNames = groupNames.filter(Boolean); // Filtering out null values (error occurred for specific groups)
+            const serializedGroupNames = JSON.stringify(filteredGroupNames); // Convert to JSON
+            return serializedGroupNames;
         } else {
             throw new Error('User not found');
         }
@@ -44,6 +46,7 @@ export const getGroupNamesByUserId = async (userId: string) => {
         throw new Error('Error fetching group names by user ID');
     }
 };
+
 
 export const storeNewMessageInGroup = async (groupId: string, userId: string, message: string) => {
     try {
@@ -53,11 +56,11 @@ export const storeNewMessageInGroup = async (groupId: string, userId: string, me
             const newMessage = await createMessage(userId, message);
             group.messages.push(newMessage._id.toString() as string & MessageInputWithId); // Cast the new message ID to 'string & MessageInputWithId'
             await group.save();
-            return group;
+            return group.toJSON();
         } else {
             throw new Error('Group not found for ID: ' + groupId);
         }
-    } catch (error:any) {
+    } catch (error: any) {
         console.error('Error storing message in group:', error);
         throw new Error('Failed to store message in group: ' + error.message);
     }
@@ -70,14 +73,15 @@ export const createGroupService = async (userId: string, groupInput: { name: str
             name: groupInput.name,
             description: groupInput.description,
             admin: userId.toString(),
-            participants: [userId.toString()],
+            participants: [],
         });
 
         // Update participants in the new group
-        newGroup.participants = Array.from(new Set([...newGroup.participants, ...groupInput.memberIds])) as string[];
+        newGroup.participants = [userId.toString(), ...groupInput.memberIds.map((id) => id.toString())];
 
         // Save the new group to the database
         const savedGroup = await newGroup.save();
+        savedGroup._id = savedGroup._id.toString();
 
         console.log('saved group');
         return savedGroup;
@@ -102,7 +106,7 @@ export const createNewGroupService: (userId: string, groupInput: { name: string,
         );
 
         console.log('updated groupMemberOf attribute for all participants');
-        return newGroup;
+        return newGroup.toJSON();
     }
     catch (err) {
         throw new Error('Error creating group leee');

@@ -4,24 +4,24 @@ import { model } from 'mongoose';
 
 const contactSchema = new Schema<contactInputWithId>({
     from: {
-        type: Schema.Types.ObjectId,
+        type: String || Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
     to: {
-        type: Schema.Types.ObjectId,
+        type: String || Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
     messagesfrom: [
         {
-            type: Schema.Types.ObjectId,
+            type: String || Schema.Types.ObjectId,
             ref: 'Message',
         }
     ],
     messagesto: [
         {
-            type: Schema.Types.ObjectId,
+            type: String ||  Schema.Types.ObjectId,
             ref: 'Message',
         }
     ],

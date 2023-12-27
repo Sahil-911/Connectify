@@ -4,7 +4,7 @@ import { Message } from '@/types/Message.interface';
 
 export interface GroupChatInput {
     name: string;
-    admin: User;
+    admin: String | User;
     description: string;
     participants: string[] | User[];
     messages: string[] | Message[];

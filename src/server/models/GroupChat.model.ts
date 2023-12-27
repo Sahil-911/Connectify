@@ -7,7 +7,7 @@ const groupChatSchema = new Schema<GroupChatInputWithId>({
         required: true,
     },
     admin: {
-        type: Schema.Types.ObjectId,
+        type: String || Schema.Types.ObjectId,
         ref: 'User', // Reference to the User model
         required: true,
     },
@@ -16,14 +16,14 @@ const groupChatSchema = new Schema<GroupChatInputWithId>({
     },
     participants: [
         {
-            type: Schema.Types.ObjectId,
+            type: String || Schema.Types.ObjectId,
             ref: 'User', // Reference to the User model
             required: true,
         },
     ],
     messages: [
         {
-            type: Schema.Types.ObjectId,
+            type:  String || Schema.Types.ObjectId,
             ref: 'Message', // Reference to the Message model
         },
     ],

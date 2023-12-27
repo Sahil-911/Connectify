@@ -50,10 +50,11 @@ export const getMessagesUser1User2 = async (userId1: string, userId2: string) =>
 export const createMessage = async (userId: string, message: string) => {
     try {
         const newMessage = await MessageModel.create({
-            sender: userId,
+            sender: userId.toString(),
             content: message,
             timestamp: Date.now()
         });
+        newMessage._id = newMessage._id.toString();
         return newMessage;
     } catch (error:any) {
         console.error('Error creating message:', error);

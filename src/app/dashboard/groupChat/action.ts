@@ -39,8 +39,11 @@ export async function GetNameOfGroups(session: SessionInterface) {
         const { id } = verifyToken(session);
         const groupNames = await getGroupNamesByUserId(id);
         console.log(groupNames);
-        if (groupNames)
+
+        if (groupNames) {
+            console.log(groupNames);
             return { groupNames, message: 'groupNames fetched successfully' };
+        }
         else {
             return { groupNames: null, message: 'No groups found' };
         }
@@ -56,21 +59,29 @@ export async function GetMessagesGC(session: SessionInterface, groupId: string) 
         const { id } = verifyToken(session);
         if (id) {
             const messages = await getMessagesGC(groupId);
-            console.log(messages, 'action');
-            if (messages)
-                return { messages, message: 'message fetched successfully' };
-            else
-                return { messages: null, message: 'messages not found' };
-        } else {
-            return { messages: null, message: 'sorry!' }
-        }
-    }
-    catch (err: any) {
-        console.log('error', err.message);
-        return { messages: null, message: err.message }
 
+            // Convert Mongoose documents to plain JavaScript objects if necessary
+            const plainMessages = messages.map(message => message.toObject());
+
+            console.log(plainMessages, 'action');
+            if (plainMessages) {
+                plainMessages.map((msg) => {
+                    msg._id = msg._id.toString();
+                    msg.sender = msg.sender.toString();
+                })
+                return { messages: plainMessages, message: 'message fetched successfully' };
+            } else {
+                return { messages: null, message: 'messages not found' };
+            }
+        } else {
+            return { messages: null, message: 'sorry!' };
+        }
+    } catch (err: any) {
+        console.log('error', err.message);
+        return { messages: null, message: err.message };
     }
 }
+
 
 export async function StoreNewMessageInGroup(session: SessionInterface, groupId: string, message: string) {
     try {
@@ -80,9 +91,16 @@ export async function StoreNewMessageInGroup(session: SessionInterface, groupId:
         // Check the implementation of storeNewMessageInGroup function
         const chats = await storeNewMessageInGroup(groupId, id, message);
         console.log(chats);
-        
+
         if (chats) {
-            return { chats, message: 'message stored successfully' };
+
+            return {
+                chats: {
+                    _id: chats._id.toString(),
+                    admin: chats.admin,
+                    message: chats.messages.map((message) => message = message.toString())
+                }, message: 'message stored successfully'
+            };
         } else {
             return { chats: null, message: 'message not stored' };
         }
@@ -114,6 +132,13 @@ export async function CreateNewGroup(session: SessionInterface, { groupInput }: 
     try {
         const { id } = verifyToken(session);
         const group = await createNewGroupService(id, groupInput);
+
+        // convert objectId to string
+        group._id = group._id.toString();
+        group.admin = group.admin.toString();
+        group.participants = group.participants.map((id: string) => id.toString());
+        group.messages = group.messages.map((id: string) => id.toString());
+
         console.log('hmmmmmm', group);
         if (group) {
             console.log('nigghhhhaa', group);

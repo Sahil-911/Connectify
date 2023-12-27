@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { Autocomplete, Button, Paper, TextField, Typography } from '@mui/material';
 import { useAuth } from '@/context/session';
-import { CreateNewGroup, GetAllFriends } from './action';
+import { CreateNewGroup, GetAllFriends, GetNameOfGroups } from './action'; // Import GetNameOfGroups
 
-export default function CreateGroup() {
+export default function CreateGroup({ onGroupCreated, setGroups }: { onGroupCreated: () => void, setGroups: React.Dispatch<React.SetStateAction<any[]>> }) {
     const { session } = useAuth();
 
     const [groupName, setGroupName] = useState('');
@@ -38,15 +38,20 @@ export default function CreateGroup() {
                         memberIds: ids,
                     },
                 });
-                console.log('testing');
+                if (response.group) {
+                    onGroupCreated();
 
-                console.log(response.group);
+                    // Fetch groups again after a new group is created
+                    GetNameOfGroups(session)
+                        .then((response) => {
+                            console.log(response);
+                            const fetchedGroups = JSON.parse(response.groupNames || '[]');
+                            setGroups(fetchedGroups);
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching groups:', error);
+                        });
 
-                if (response.message === 'Group created successfully') {
-                    console.log(response.group);
-                    console.log('Group created successfully');
-                } else {
-                    console.log('Group not created');
                 }
             } else {
                 alert('Please select at least one group member.');

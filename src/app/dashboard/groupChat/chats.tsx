@@ -19,6 +19,8 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
 
     const [messages, setMessages] = useState<MessageInputWithId[]>([]);
     const [newMessageContent, setNewMessageContent] = useState<string>('');
+    const [admin, setAdmin] = useState();
+    const [members, setMembers] = useState();
 
     useEffect(() => {
         GetMessagesGC(session, selectedGroup._id).then((response) => {
