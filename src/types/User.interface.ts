@@ -7,9 +7,9 @@ export interface UserInput {
     password: string;
     bio?: string;
     gender: string;
-    connections?: User[];
-    pendingConnections?: User[];
-    connectionRequests?: User[];
+    connections?: String[] | User[];
+    pendingConnections?: String[] | User[];
+    connectionRequests?: String[] | User[];
     groupMemberOf?: string[] | groupChat[];
 }
 

@@ -54,9 +54,23 @@ export const storeNewMessageInGroup = async (groupId: string, userId: string, me
 
         if (group) {
             const newMessage = await createMessage(userId, message);
-            group.messages.push(newMessage._id.toString() as string & MessageInputWithId); // Cast the new message ID to 'string & MessageInputWithId'
+
+            // Ensure group.messages is initialized as an empty array if it's undefined
+            if (!group.messages) {
+                group.messages = [];
+            }
+
+            // Push the new message's ID to the messages array
+            group.messages.push(newMessage._id.toString() as string & MessageInputWithId);
+
+            // Save the changes to the group
             await group.save();
-            return group.toJSON();
+
+            // Update the newMessage object with _id and sender as strings
+            newMessage._id = newMessage._id.toString();
+            newMessage.sender = userId;
+
+            return group.toJSON(); // Return the updated group
         } else {
             throw new Error('Group not found for ID: ' + groupId);
         }
@@ -65,6 +79,9 @@ export const storeNewMessageInGroup = async (groupId: string, userId: string, me
         throw new Error('Failed to store message in group: ' + error.message);
     }
 };
+
+
+
 
 
 export const createGroupService = async (userId: string, groupInput: { name: string, description: string, memberIds: string[] }) => {

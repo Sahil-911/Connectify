@@ -31,7 +31,7 @@ export default function PendingConnections() {
     useEffect(() => {
         GetAllPendings(session)
             .then((response) => {
-                const fetchedPendings = response.pendings?.pendingConnections || [];
+                const fetchedPendings = response.pendings || [];
                 console.log(fetchedPendings);
                 setPendings(fetchedPendings);
             })

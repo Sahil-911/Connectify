@@ -19,14 +19,13 @@ const Contacts = ({ onSelectContact }: { onSelectContact: (contact: { _id: strin
         GetNameOfConnections(session)
             .then((response) => {
                 console.log(response);
-                const fetchedContacts = response.contacts?.connections as { _id: string, name: string, username: string }[] || [];
+                const fetchedContacts = response.contacts as { _id: string, name: string, username: string }[] || [];
                 setContacts(fetchedContacts);
             })
             .catch((error) => {
                 console.error('Error fetching contacts:', error);
             });
-    }
-        , [session]);
+    }, [session]);
 
     return (
         <div style={{ borderRadius: '6px 0 0 0', height: '100%', backgroundColor: '#262626', border: '1px solid #1f1f1f', paddingBottom: 0, minWidth: '200px' }}>

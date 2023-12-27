@@ -29,18 +29,19 @@ export const getUserById = async ({ id }: { id: string }) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const user = await UserModel.findById(id);
-        return {
-            _id: user?._id,
-            name: user?.name,
-            username: user?.username,
-            email: user?.email,
-            bio: user?.bio,
-            gender: user?.gender,
-            connections: user?.connections,
-            pendingConnections: user?.pendingConnections,
-            connectionRequests: user?.connectionRequests,
-            groupMemberOf: user?.groupMemberOf
-        }
+        // return {
+        //     _id: user?._id,
+        //     name: user?.name,
+        //     username: user?.username,
+        //     email: user?.email,
+        //     bio: user?.bio,
+        //     gender: user?.gender,
+        //     connections: user?.connections?.toString(),
+        //     pendingConnections: user?.pendingConnections?.toString(),
+        //     connectionRequests: user?.connectionRequests?.toString(),
+        //     groupMemberOf: user?.groupMemberOf?.toString()
+        // }
+        return user?.toJSON();
     } else {
         throw new Error('User not found');
     }
@@ -133,13 +134,13 @@ export const disconnectByIdWithdrawal = async (userId: string, id: string) => {
             const objectId2 = id;
             if (user1) {
                 if (Array.isArray(user1.pendingConnections)) {
-                    user1.pendingConnections = user1.pendingConnections.filter((connection) => connection.toString() !== objectId2.toString());
+                    user1.pendingConnections = user1.pendingConnections.filter((connection) => connection.toString() !== objectId2.toString()) as string[];
                 }
                 await user1.save();
             }
             if (user2) {
                 if (Array.isArray(user2.connectionRequests)) {
-                    user2.connectionRequests = user2.connectionRequests.filter((connection) => connection.toString() !== objectId1.toString());
+                    user2.connectionRequests = user2.connectionRequests.filter((connection) => connection.toString() !== objectId1.toString()) as string[];
                 }
                 await user2.save();
             }
@@ -162,7 +163,7 @@ export const getAllNewUsers = async (userId: string) => {
             throw new Error('User not found');
         }
 
-        const connections = user.connections || [];
+        const connections = Array.isArray(user.connections) ? user.connections : [];
         const pendingConnections = user.pendingConnections || [];
         const connectionRequests = user.connectionRequests || [];
 
@@ -170,15 +171,15 @@ export const getAllNewUsers = async (userId: string) => {
         const newUsers = await UserModel.find({
             _id: {
                 $nin: [
-                    ...connections.map(conn => conn._id?.toString()),
-                    ...pendingConnections.map(pendingConn => pendingConn._id),
-                    ...connectionRequests.map(req => req._id),
+                    ...connections,
+                    ...pendingConnections,
+                    ...connectionRequests,
                     userId
                 ]
             }
         });
 
-        return newUsers;
+        return newUsers.map((newUser) => newUser.toJSON());
     } catch (error: any) {
         throw new Error('Error fetching new users: ' + error.message);
     }
@@ -193,23 +194,9 @@ export const getAllConnections = async (userId: string) => {
         }
 
         const connections = user.connections || [];
-        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+        const connectedUsers = await UserModel.find({ _id: { $in: connections } });
 
-        const formattedConnections = connectedUsers.map((connectedUser: any) => ({
-            _id: connectedUser._id,
-            name: connectedUser.name,
-            username: connectedUser.username,
-            email: connectedUser.email,
-            password: '',
-            bio: connectedUser.bio,
-            gender: connectedUser.gender,
-            connections: connectedUser.connections,
-            pendingConnections: connectedUser.pendingConnections,
-            connectionRequests: connectedUser.connectionRequests,
-            groupMemberOf: connectedUser.groupMemberOf
-        }));
-
-        return { connections: formattedConnections };
+        return connectedUsers.map((connectedUser) => connectedUser.toJSON());
     } catch (error: any) {
         throw new Error('Error fetching connections: ' + error.message);
     }
@@ -224,7 +211,7 @@ export const getAllConnectionsNameId = async (userId: string) => {
         }
 
         const connections = user.connections || [];
-        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+        const connectedUsers = await UserModel.find({ _id: { $in: connections } });
 
         const formattedConnections = connectedUsers.map((connectedUser: any) => ({
             _id: connectedUser._id,
@@ -247,23 +234,10 @@ export const getAllPendingConnections = async (userId: string) => {
         }
 
         const pendingConnections = user.pendingConnections || [];
-        const pendingUsers = await UserModel.find({ _id: { $in: pendingConnections.map(pen => pen._id) } });
+        const pendingUsers = await UserModel.find({ _id: { $in: pendingConnections } });
 
-        const formattedPendingConnections = pendingUsers.map((pendingUser: any) => ({
-            _id: pendingUser._id,
-            name: pendingUser.name,
-            username: pendingUser.username,
-            email: pendingUser.email,
-            password: '',
-            bio: pendingUser.bio,
-            gender: pendingUser.gender,
-            connections: pendingUser.connections,
-            pendingConnections: pendingUser.pendingConnections,
-            connectionRequests: pendingUser.connectionRequests,
-            groupMemberOf: pendingUser.groupMemberOf
-        }));
+        return pendingUsers.map((pendingUser) => pendingUser.toJSON());
 
-        return { pendingConnections: formattedPendingConnections };
     } catch (error: any) {
         throw new Error('Error fetching pendingConnections: ' + error.message);
     }
@@ -278,23 +252,9 @@ export const getAllConnectionRequests = async (userId: string) => {
         }
 
         const connectionRequests = user.connectionRequests || [];
-        const requests = await UserModel.find({ _id: { $in: connectionRequests.map(pen => pen._id) } });
+        const requests = await UserModel.find({ _id: { $in: connectionRequests } });
 
-        const formattedConnectionRequests = requests.map((request: any) => ({
-            _id: request._id,
-            name: request.name,
-            username: request.username,
-            email: request.email,
-            password: '',
-            bio: request.bio,
-            gender: request.gender,
-            connections: request.connections,
-            pendingConnections: request.pendingConnections,
-            connectionRequests: request.connectionRequests,
-            groupMemberOf: request.groupMemberOf
-        }));
-
-        return { connectionRequests: formattedConnectionRequests };
+        return requests.map((request) => request.toJSON());
     } catch (error: any) {
         throw new Error('Error fetching connectionRequests: ' + error.message);
     }
@@ -322,16 +282,16 @@ export const acceptRequest = async (userId: string, id: string) => {
                 console.log('user1 ok 6e');
                 user1.connections = user1.connections || [];
                 user1.connections.push(id as any);
-                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
-                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== id);
+                user1.connectionRequests = user1.connectionRequests?.filter(connection => connection.toString() !== id) as string[];
+                user1.pendingConnections = user1.pendingConnections?.filter(connection => connection.toString() !== id) as string[];
                 await user1.save();
             }
             if (user2) {
                 console.log('user2 ok 6e');
                 user2.connections = user2.connections || [];
                 user2.connections.push(userId as any);
-                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
-                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== userId);
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId) as string[];
+                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== userId) as string[];
                 await user2.save();
             }
             console.log(user1, user2);
@@ -351,11 +311,11 @@ export const rejectRequest = async (userId: string, id: string) => {
     if (user2Exists) {
         if (user1 && user1.connectionRequests?.includes(id as any)) {
             if (user1) {
-                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
+                user1.connectionRequests = (user1.connectionRequests as string[])?.filter((connection) => connection.toString() !== id);
                 await user1.save();
             }
             if (user2) {
-                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId) as string[];
                 await user2.save();
             }
             console.log(user1, user2);
@@ -375,15 +335,15 @@ export const removeFriend = async (userId: string, id: string) => {
     if (user2Exists) {
         if (user1 && user1.connections?.includes(id as any)) {
             if (user1) {
-                user1.connections = user1.connections?.filter((connection) => connection.toString() !== id);
-                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== id);
-                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection.toString() !== id);
+                user1.connections = user1.connections?.filter((connection) => connection?.toString() !== id) as string[];
+                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection?.toString() !== id) as string[];
+                user1.connectionRequests = user1.connectionRequests?.filter((connection) => connection?.toString() !== id) as string[];
                 await user1.save();
             }
             if (user2) {
-                user2.connections = user2.connections?.filter((connection) => connection.toString() !== userId);
-                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection.toString() !== userId);
-                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== userId);
+                user2.connections = user2.connections?.filter((connection) => connection?.toString() !== userId) as string[];
+                user2.pendingConnections = user2.pendingConnections?.filter((connection) => connection?.toString() !== userId) as string[];
+                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection?.toString() !== userId) as string[];
                 await user2.save();
             }
             console.log(user1, user2);
@@ -405,15 +365,15 @@ export const getNameOfConnections = async (userId: string) => {
         }
 
         const connections = user.connections || [];
-        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+        const connectedUsers = await UserModel.find({ _id: { $in: connections } });
 
         const formattedConnections = connectedUsers.map((connectedUser: any) => ({
-            _id: connectedUser._id,
-            name: connectedUser.name,
-            username: connectedUser.username,
+            _id: connectedUser._id.toString(),
+            name: connectedUser.name.toString(),
+            username: connectedUser.username.toString(),
         }));
 
-        return { connections: formattedConnections };
+        return formattedConnections;
     } catch (error: any) {
         throw new Error('Error fetching connections: ' + error.message);
     }
@@ -429,7 +389,7 @@ export const getConnectionsByLastMessage = async (userId: string) => {
         }
 
         const connections = user.connections || [];
-        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+        const connectedUsers = await UserModel.find({ _id: { $in: connections } });
 
         // Retrieve the last messages for each connected user
         const lastMessages = await Promise.all(connectedUsers.map(async (connectedUser: any) => {

@@ -2,8 +2,8 @@ import { Message } from "./Message.interface";
 import { User } from "./User.interface";
 
 export interface contactInput {
-    from: User;
-    to: User;
+    from: string | User;
+    to: string | User;
     messagesfrom: string[] | Message[];
     messagesto: string[] | Message[];
 }

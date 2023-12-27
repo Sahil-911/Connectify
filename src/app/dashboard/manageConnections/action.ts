@@ -21,17 +21,25 @@ export async function FetchProfile(session: SessionInterface) {
 export async function GetAllFriends(session: SessionInterface) {
     try {
         const { id } = verifyToken(session);
-        const friends = await getAllConnections(id);
+        const connections = await getAllConnections(id);
 
-        console.log(friends);
+        connections.map((connection) => {
+            connection._id = connection._id.toString();
+            connection.connections = connection?.connections?.toString().split(',') || [];
+            connection.connectionRequests = connection.connectionRequests?.toString().split(',') || [];
+            connection.pendingConnections = connection.pendingConnections?.toString().split(',') || [];
+            connection.groupMemberOf = connection.groupMemberOf?.toString().split(',') || [];
+        })
 
-        if (friends.connections) {
-            return { friends, message: 'Friends fetched successfully' };
+        console.log(connections);
+
+        if (connections) {
+            return { connections, message: 'Friends fetched successfully' };
         } else {
-            return { friends: null, message: 'No friends found' };
+            return { connections: null, message: 'No friends found' };
         }
     } catch (err: any) {
-        return { friends: null, message: err.message };
+        return { connections: null, message: err.message };
     }
 }
 
@@ -57,9 +65,17 @@ export async function GetAllPendings(session: SessionInterface) {
         const { id } = verifyToken(session);
         const pendings = await getAllPendingConnections(id);
 
+        pendings.map((pending) => {
+            pending._id = pending._id.toString();
+            pending.connections = pending?.connections?.toString().split(',') || [];
+            pending.connectionRequests = pending.connectionRequests?.toString().split(',') || [];
+            pending.pendingConnections = pending.pendingConnections?.toString().split(',') || [];
+            pending.groupMemberOf = pending.groupMemberOf?.toString().split(',') || [];
+        })
+
         console.log(pendings);
 
-        if (pendings.pendingConnections) {
+        if (pendings) {
             return { pendings, message: 'Pendings fetched successfully' };
         } else {
             return { pendings: null, message: 'No pendings found' };
@@ -74,9 +90,17 @@ export async function GetAllRequests(session: SessionInterface) {
         const { id } = verifyToken(session);
         const requests = await getAllConnectionRequests(id);
 
+        requests.map((request) => {
+            request._id = request._id.toString();
+            request.connections = request?.connections?.toString().split(',') || [];
+            request.connectionRequests = request.connectionRequests?.toString().split(',') || [];
+            request.pendingConnections = request.pendingConnections?.toString().split(',') || [];
+            request.groupMemberOf = request.groupMemberOf?.toString().split(',') || [];
+        })
+
         console.log(requests);
 
-        if (requests.connectionRequests) {
+        if (requests) {
             return { requests, message: 'Requests fetched successfully' };
         } else {
             return { requests: null, message: 'No requests found' };

@@ -24,6 +24,17 @@ export async function GetAllProfiles(session: SessionInterface) {
         const { id } = verifyToken(session);
         if (!id) throw new Error('Invalid token');
         const profiles = await getAllNewUsers(id);
+
+        profiles.map((profile) => {
+            profile._id = profile._id.toString();
+            profile.connections = profile?.connections?.toString().split(',') || [];
+            profile.connectionRequests = profile.connectionRequests?.toString().split(',') || [];
+            profile.pendingConnections = profile.pendingConnections?.toString().split(',') || [];
+            profile.groupMemberOf = profile.groupMemberOf?.toString().split(',') || [];
+        })
+
+        console.log(profiles);
+
         if (profiles)
             return { profiles, message: 'profiles fetched successfully' };
     }

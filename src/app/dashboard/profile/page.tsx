@@ -178,12 +178,12 @@ const Profile = () => {
                             <Divider variant='middle' sx={{ backgroundColor: '#333', my: 1 }} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                                 <Typography variant="h5">Number of Pending Requests: </Typography>
-                                <Typography variant="h5">{profileDetails.pendingConnections?.length || 0}</Typography>
+                                <Typography variant="h5">{profileDetails?.pendingConnections?.length || 0}</Typography>
                             </div>
                             <Divider variant='middle' sx={{ backgroundColor: '#333', my: 1 }} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                                 <Typography variant="h5">Number of Connection Requests: </Typography>
-                                <Typography variant="h5">{profileDetails.connectionRequests?.length || 0}</Typography>
+                                <Typography variant="h5">{profileDetails?.connectionRequests?.length || 0}</Typography>
                             </div>
                         </div>
                         <Divider variant='fullWidth' sx={{ backgroundColor: '#333', my: 3 }} />

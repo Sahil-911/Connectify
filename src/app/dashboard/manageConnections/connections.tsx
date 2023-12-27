@@ -31,7 +31,7 @@ export default function Connections() {
     useEffect(() => {
         GetAllFriends(session)
             .then((response) => {
-                const fetchedFriends = response?.friends?.connections || [];
+                const fetchedFriends = response.connections || [];
                 console.log(fetchedFriends);
                 setFriends(fetchedFriends);
             })

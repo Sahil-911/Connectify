@@ -16,15 +16,16 @@ export async function FetchProfile(session: SessionInterface) {
             console.log('to pa6i hu 6e', profile)
         return {
             profile: {
-                _id: profile?._id,
+                _id: profile?._id.toString(),
                 username: profile?.username,
                 name: profile?.name,
                 email: profile?.email,
                 bio: profile?.bio,
-                gender: profile.gender,
-                connections: profile?.connections,
-                pendingConnections: profile?.pendingConnections,
-                connectionRequests: profile?.connectionRequests,
+                gender: profile?.gender,
+                connections: profile?.connections?.toString(),
+                pendingConnections: profile?.pendingConnections?.toString(),
+                connectionRequests: profile?.connectionRequests?.toString(),
+                groupMemberOf: profile?.groupMemberOf?.toString(),
             }, message: 'profile fetched successfully'
         };
     }
@@ -88,18 +89,13 @@ export async function StoreNewMessageInGroup(session: SessionInterface, groupId:
         const { id } = verifyToken(session);
         if (!id) throw new Error('Invalid token');
 
-        // Check the implementation of storeNewMessageInGroup function
         const chats = await storeNewMessageInGroup(groupId, id, message);
         console.log(chats);
 
         if (chats) {
-
             return {
-                chats: {
-                    _id: chats._id.toString(),
-                    admin: chats.admin,
-                    message: chats.messages.map((message) => message = message.toString())
-                }, message: 'message stored successfully'
+                chats: chats, // Convert 'chats' to JSON if needed, or simply return 'chats'
+                message: 'message stored successfully'
             };
         } else {
             return { chats: null, message: 'message not stored' };
@@ -109,6 +105,7 @@ export async function StoreNewMessageInGroup(session: SessionInterface, groupId:
         return { chats: null, message: err.message };
     }
 }
+
 
 
 export async function GetAllFriends(session: SessionInterface) {

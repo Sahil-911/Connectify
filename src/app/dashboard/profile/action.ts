@@ -14,15 +14,16 @@ export async function FetchProfile(session: SessionInterface) {
             console.log('to pa6i hu 6e', profile)
         return {
             profile: {
-                _id: profile?._id,
+                _id: profile?._id.toString(),
                 username: profile?.username,
                 name: profile?.name,
                 email: profile?.email,
                 bio: profile?.bio,
-                gender: profile.gender,
-                connections: profile?.connections,
-                pendingConnections: profile?.pendingConnections,
-                connectionRequests: profile?.connectionRequests,
+                gender: profile?.gender,
+                connections: profile?.connections?.toString(),
+                pendingConnections: profile?.pendingConnections?.toString(),
+                connectionRequests: profile?.connectionRequests?.toString(),
+                groupMemberOf: profile?.groupMemberOf?.toString(),
             }, message: 'profile fetched successfully'
         };
     }

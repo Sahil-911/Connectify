@@ -21,7 +21,11 @@ export const getMessagesUser1User2 = async (userId1: string, userId2: string) =>
         });
 
         console.log('all..', allMessages);
-        return allMessages;
+
+        // Convert all messages to JSON format
+        const messagesJSON = allMessages.map((message) => message.toJSON());
+
+        return messagesJSON;
     }
     console.log('no contact found');
     return []; // Return an empty array if no contact or messages are found
@@ -54,13 +58,14 @@ export const createMessage = async (userId: string, message: string) => {
             content: message,
             timestamp: Date.now()
         });
-        newMessage._id = newMessage._id.toString();
-        return newMessage;
-    } catch (error:any) {
+        newMessage._id = newMessage._id.toString(); // Convert _id to string
+        return newMessage; // Return the newMessage object directly without calling toJSON()
+    } catch (error: any) {
         console.error('Error creating message:', error);
         throw new Error('Failed to create message: ' + error.message);
     }
 };
+
 
 export const getMessagesGC = async (groupId: string) => {
     const group = await GroupChatModel.findById(groupId);
@@ -70,6 +75,6 @@ export const getMessagesGC = async (groupId: string) => {
         console.log('messages service', messages)
         return messages;
     }
-    console.log('wth',group);
+    console.log('wth', group);
     return [];
 }

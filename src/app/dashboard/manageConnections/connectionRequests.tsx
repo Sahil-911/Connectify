@@ -31,7 +31,7 @@ export default function ConnectionRequests() {
     useEffect(() => {
         GetAllRequests(session)
             .then((response) => {
-                const fetchedRequests = response.requests?.connectionRequests || [];
+                const fetchedRequests = response.requests || [];
                 console.log(fetchedRequests);
                 setRequests(fetchedRequests);
             })

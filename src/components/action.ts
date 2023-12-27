@@ -13,9 +13,24 @@ export async function FetchProfile(session: SessionInterface) {
         const profile = await getUserById({ id });
         console.log(profile);
         if (profile)
-            return { profile, message: 'profile fetched successfully' };
+            console.log('to pa6i hu 6e', profile)
+        return {
+            profile: {
+                _id: profile?._id.toString(),
+                username: profile?.username,
+                name: profile?.name,
+                email: profile?.email,
+                bio: profile?.bio,
+                gender: profile?.gender,
+                connections: profile?.connections?.toString(),
+                pendingConnections: profile?.pendingConnections?.toString(),
+                connectionRequests: profile?.connectionRequests?.toString(),
+                groupMemberOf: profile?.groupMemberOf?.toString(),
+            }, message: 'profile fetched successfully'
+        };
     }
     catch (err: any) {
+        console.log('error', err.message);
         return { profile: null, message: err.message }
     }
 }
@@ -57,8 +72,11 @@ export async function GetNameOfConnections(session: SessionInterface) {
     try {
         const { id: userId } = verifyToken(session);
         if (!userId) throw new Error('Invalid token');
-        const contacts = await getNameOfConnections(userId);
+        const contacts: { _id: any; name: any; username: any; }[] = await getNameOfConnections(userId);
         console.log('contacts');
+        contacts.forEach(contact => {
+            contact._id = contact._id.toString();
+        });
         return { contacts, message: 'contacts fetched successfully' };
     }
     catch (err: any) {
@@ -74,6 +92,10 @@ export async function GetMessagesUser1User2(session: SessionInterface, id: strin
         if (!userId) throw new Error('Invalid token');
         const chats = await getMessagesUser1User2(id, userId);
         console.log('contacts');
+        chats.forEach(chat => {
+            chat._id = chat._id.toString();
+            chat.sender = chat.sender.toString();
+        })
         return { chats, message: 'contacts fetched successfully' };
     }
     catch (err: any) {
@@ -89,6 +111,8 @@ export async function StoreNewMessageInContact(session: SessionInterface, id: st
         if (!userId) throw new Error('Invalid token');
         const chats = await storeNewMessageInContact(userId, id, message);
         console.log('contacts');
+        chats._id = chats._id.toString();
+        chats.sender = chats.sender.toString();
         return { chats, message: 'message stored successfully' };
     }
     catch (err: any) {

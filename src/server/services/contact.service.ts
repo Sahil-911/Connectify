@@ -43,7 +43,9 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
             await contact?.save();
         }
 
-        return newMessage; // Return the newly created message if needed
+        newMessage._id = newMessage._id.toString();
+        newMessage.sender = newMessage.sender.toString();
+        return newMessage.toJSON(); // Return the newly created message if needed
     } else {
 
         // Create a new contact
@@ -56,6 +58,8 @@ export const storeNewMessageInContact = async (userId1: string, userId2: string,
         newContact.messagesfrom.push(newMessage._id as string & MessageInputWithId);
         await newContact.save();
 
-        return newMessage; // Return the newly created message if needed
+        newMessage._id = newMessage._id.toString();
+        newMessage.sender = newMessage.sender.toString();
+        return newMessage.toJSON(); // Return the newly created message if needed
     }
 }
