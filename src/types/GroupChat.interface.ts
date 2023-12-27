@@ -6,8 +6,8 @@ export interface GroupChatInput {
     name: string;
     admin: User;
     description: string;
-    participants: User[];
-    messages: Message[];
+    participants: string[] | User[];
+    messages: string[] | Message[];
 }
 
 export interface GroupChatInputWithId extends GroupChatInput {

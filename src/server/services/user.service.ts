@@ -2,6 +2,7 @@ import { UserModel } from '@/server/models/User.model';
 import { UserInput, UserInputWithId } from '@/types/User.interface';
 import bcrypt from 'bcrypt';
 import { Document } from 'mongoose';
+import { MessageModel } from '../models/Message.model';
 
 export const createUser = async (user: UserInput) => {
     console.log('we are in createUser');
@@ -131,11 +132,15 @@ export const disconnectByIdWithdrawal = async (userId: string, id: string) => {
             const objectId1 = userId;
             const objectId2 = id;
             if (user1) {
-                user1.pendingConnections = user1.pendingConnections?.filter((connection) => connection.toString() !== objectId2.toString());
+                if (Array.isArray(user1.pendingConnections)) {
+                    user1.pendingConnections = user1.pendingConnections.filter((connection) => connection.toString() !== objectId2.toString());
+                }
                 await user1.save();
             }
             if (user2) {
-                user2.connectionRequests = user2.connectionRequests?.filter((connection) => connection.toString() !== objectId1.toString());
+                if (Array.isArray(user2.connectionRequests)) {
+                    user2.connectionRequests = user2.connectionRequests.filter((connection) => connection.toString() !== objectId1.toString());
+                }
                 await user2.save();
             }
             console.log(user1, user2);
@@ -165,7 +170,7 @@ export const getAllNewUsers = async (userId: string) => {
         const newUsers = await UserModel.find({
             _id: {
                 $nin: [
-                    ...connections.map(conn => conn._id),
+                    ...connections.map(conn => conn._id?.toString()),
                     ...pendingConnections.map(pendingConn => pendingConn._id),
                     ...connectionRequests.map(req => req._id),
                     userId
@@ -413,6 +418,56 @@ export const getNameOfConnections = async (userId: string) => {
         throw new Error('Error fetching connections: ' + error.message);
     }
 }
+
+// get the list of connections in order of their last message, connection with latest message comes first
+export const getConnectionsByLastMessage = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId).populate('connections');
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const connections = user.connections || [];
+        const connectedUsers = await UserModel.find({ _id: { $in: connections.map(conn => conn._id) } });
+
+        // Retrieve the last messages for each connected user
+        const lastMessages = await Promise.all(connectedUsers.map(async (connectedUser: any) => {
+            const lastMessage = await MessageModel.findOne({ sender: connectedUser._id }).sort({ timestamp: -1 }).limit(1);
+            return {
+                userId: connectedUser._id,
+                lastMessage: lastMessage ? lastMessage.timestamp : null,
+            };
+        }));
+
+        // Sort the connected users based on their last message timestamps in descending order
+        connectedUsers.sort((a: any, b: any) => {
+            const lastMessageA = lastMessages.find((msg) => msg.userId.equals(a._id));
+            const lastMessageB = lastMessages.find((msg) => msg.userId.equals(b._id));
+
+            if (!lastMessageA || !lastMessageB) {
+                return 0;
+            }
+
+            if (lastMessageA.lastMessage && lastMessageB.lastMessage) {
+                return lastMessageB.lastMessage.getTime() - lastMessageA.lastMessage.getTime();
+            }
+
+            return 0;
+        });
+
+        const formattedConnections = connectedUsers.map((connectedUser: any) => ({
+            _id: connectedUser._id,
+            name: connectedUser.name,
+            username: connectedUser.username,
+        }));
+
+        return { connections: formattedConnections };
+    } catch (error: any) {
+        throw new Error('Error fetching connections: ' + error.message);
+    }
+};
+
 
 function castDocumentToUser(
     user: (Document<unknown, {}, UserInputWithId>) | null

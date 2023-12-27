@@ -5,7 +5,7 @@ import { Autocomplete, Button, Paper, TextField, Typography } from '@mui/materia
 import { useAuth } from '@/context/session';
 import { CreateNewGroup, GetAllFriends } from './action';
 
-export default function CreateGroup({ handleModalClose }: { handleModalClose: () => void }) {
+export default function CreateGroup() {
     const { session } = useAuth();
 
     const [groupName, setGroupName] = useState('');
@@ -48,12 +48,11 @@ export default function CreateGroup({ handleModalClose }: { handleModalClose: ()
                 } else {
                     console.log('Group not created');
                 }
-                handleModalClose();
             } else {
                 alert('Please select at least one group member.');
             }
         } catch (error) {
-            // console.error('Error creating group:', error);
+            console.error('Error creating group:', error);
         }
     };
 

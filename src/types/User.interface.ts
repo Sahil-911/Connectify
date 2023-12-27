@@ -10,7 +10,7 @@ export interface UserInput {
     connections?: User[];
     pendingConnections?: User[];
     connectionRequests?: User[];
-    groupMemberOf?: groupChat[];
+    groupMemberOf?: string[] | groupChat[];
 }
 
 export interface UserInputWithId extends UserInput {

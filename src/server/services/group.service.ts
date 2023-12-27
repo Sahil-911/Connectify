@@ -2,6 +2,7 @@ import { User, UserInputWithId } from "@/types/User.interface";
 import { GroupChatModel } from "../models/GroupChat.model";
 import { UserModel } from "../models/User.model";
 import { createMessage } from "./message.service";
+import { MessageInputWithId } from "@/types/Message.interface";
 
 export const getGroupNameById = async (groupId: string) => {
     try {
@@ -26,11 +27,11 @@ export const getGroupNamesByUserId = async (userId: string) => {
             const groupNames = await Promise.all(
                 (user.groupMemberOf || []).map(async (group) => {
                     try {
-                        const groupInfo = await getGroupNameById(group._id);
+                        const groupInfo = await getGroupNameById(group.toString());
                         return groupInfo;
                     } catch (error) {
                         // Handle error for a specific group and continue with others
-                        console.error(`Error fetching group info for group ID: ${group._id}`, error);
+                        console.error(`Error fetching group info for group ID: ${group}`, error);
                         return null;
                     }
                 })
@@ -50,7 +51,7 @@ export const storeNewMessageInGroup = async (groupId: string, userId: string, me
 
         if (group) {
             const newMessage = await createMessage(userId, message);
-            group.messages.push(newMessage);
+            group.messages.push(newMessage._id.toString() as string & MessageInputWithId); // Cast the new message ID to 'string & MessageInputWithId'
             await group.save();
             return group;
         } else {
@@ -68,12 +69,12 @@ export const createGroupService = async (userId: string, groupInput: { name: str
         const newGroup = await GroupChatModel.create({
             name: groupInput.name,
             description: groupInput.description,
-            admin: userId,
-            participants: [userId],
+            admin: userId.toString(),
+            participants: [userId.toString()],
         });
 
         // Update participants in the new group
-        newGroup.participants = Array.from(new Set([...newGroup.participants, ...groupInput.memberIds])) as UserInputWithId[];
+        newGroup.participants = Array.from(new Set([...newGroup.participants, ...groupInput.memberIds])) as string[];
 
         // Save the new group to the database
         const savedGroup = await newGroup.save();
@@ -97,7 +98,7 @@ export const createNewGroupService: (userId: string, groupInput: { name: string,
             {
                 $or: [{ _id: userId }, { _id: { $in: groupInput.memberIds } }]
             },
-            { $addToSet: { groupMemberOf: newGroup._id } }
+            { $addToSet: { groupMemberOf: newGroup._id.toString() as string } }
         );
 
         console.log('updated groupMemberOf attribute for all participants');

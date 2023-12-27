@@ -50,7 +50,7 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
                 </Button>
                 <Modal open={openModal} onClose={handleModalClose}>
                     <Box sx={{ width: "90%", maxWidth: '450px', bgcolor: '#1f1f1f', color: '#fff', p: 2, borderRadius: '8px', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                        <CreateGroup handleModalClose={handleModalClose} />
+                        <CreateGroup />
                     </Box>
                 </Modal>
             </div>

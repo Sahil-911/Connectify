@@ -4,8 +4,8 @@ import { User } from "./User.interface";
 export interface contactInput {
     from: User;
     to: User;
-    messagesfrom: Message[];
-    messagesto: Message[];
+    messagesfrom: string[] | Message[];
+    messagesto: string[] | Message[];
 }
 
 export interface contactInputWithId extends contactInput {

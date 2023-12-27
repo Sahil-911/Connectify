@@ -1,7 +1,7 @@
 import { User } from "./User.interface";
 
 export interface MessageInput {
-    sender: User;
+    sender: string | User;
     content: string;
     timestamp: Date;
 }
