@@ -41,7 +41,7 @@ const LandingPage = () => {
             >
                 <Grid item>
                     <Typography variant="h2" align="center" gutterBottom>
-                        Welcome to my <span style={{ color: '#007bff' }}>Chat-App!</span>
+                        Welcome to <span style={{ color: '#007bff' }}>Connectify!</span>
                     </Typography>
                 </Grid>
                 <Grid item>

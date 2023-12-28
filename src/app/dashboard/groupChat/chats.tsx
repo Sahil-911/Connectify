@@ -84,8 +84,8 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
         }
     };
 
-    const handleShowProfile = (profileId:string) => {
-        
+    const handleShowProfile = (profileId: string) => {
+        console.log(profileId);
     }
 
 
@@ -120,7 +120,7 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
                     </Typography>
                     <Typography variant="caption" sx={{ ml: 1.5, mt: 0, color: '#007bff' }}>
                         {members.map((member, index) => (
-                            <span key={member.id} style={{cursor:'pointer'}} onClick={() => handleShowProfile(member.id)} >
+                            <span key={member.id} style={{ cursor: 'pointer' }} onClick={() => handleShowProfile(member.id)} >
                                 {member.username}
                                 {admin && member.username && admin.username &&
                                     member.username.toString() === admin.username && (

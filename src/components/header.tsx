@@ -9,7 +9,7 @@ const Header: React.FC = () => {
         <AppBar position="static">
             <Toolbar>
                 <CycloneIcon sx={{ marginRight: '10px', marginLeft:'0',paddingLeft:'0' }} />
-                <Typography variant="h6">chat-app</Typography>
+                <Typography variant="h6">Connectify</Typography>
             </Toolbar>
         </AppBar>
     );

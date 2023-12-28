@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html>
       <head>
-        <title>chat-app</title>
+        <title>Connectify</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="icon" href="/CycloneIcon.svg" type="image/x-icon" />
       </head>
