@@ -3,7 +3,7 @@ import { Schema, Model, model, models } from 'mongoose';
 
 const messageSchema = new Schema<MessageInputWithId>({
     sender: {
-        type: String || Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User', // Reference to the User model
         required: true,
     },

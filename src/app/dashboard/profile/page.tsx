@@ -72,7 +72,11 @@ const Profile = () => {
                         username: updatedProfile.username || '',
                         email: updatedProfile.email || '',
                         gender: updatedProfile.gender || '',
-                        bio: updatedProfile.bio
+                        bio: updatedProfile.bio,
+                        pendingConnections: updatedProfile.pendingConnections || profileDetails?.pendingConnections || [],
+                        connectionRequests: updatedProfile.connectionRequests || profileDetails?.connectionRequests || [],
+                        connections: updatedProfile.connections || profileDetails?.connections || [],
+                        groupMemberOf: updatedProfile.groupMemberOf || profileDetails?.groupMemberOf || [],
                     });
                 }
             });
@@ -122,7 +126,11 @@ const Profile = () => {
                     username: updatedProfile.username || '',
                     email: updatedProfile.email || '',
                     gender: updatedProfile.gender || '',
-                    bio: updatedProfile.bio
+                    bio: updatedProfile.bio || '',
+                    pendingConnections: updatedProfile.pendingConnections || profileDetails?.pendingConnections || [],
+                    connectionRequests: updatedProfile.connectionRequests || profileDetails?.connectionRequests || [],
+                    connections: updatedProfile.connections || profileDetails?.connections || [],
+                    groupMemberOf: updatedProfile.groupMemberOf || profileDetails?.groupMemberOf || [],
                 });
 
                 // Fetch updated profile data after successful update
@@ -143,14 +151,27 @@ const Profile = () => {
     };
 
     return (
-        <div className={styles['custom-scroll-container']} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', backgroundColor: '#333', color: '#fff', overflowY: 'auto', borderRadius: '6px 0 0 0' }}>
-            <Paper elevation={0} className='container' style={{ padding: '20px', borderRadius: '8px', height: '90%', width: '90%', backgroundColor: '#333', color: '#fff', paddingTop: '20px' }}>
+        <div className={styles['custom-scroll-container']}
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%', width: '100%',
+                backgroundColor: '#333333',
+                color: '#fff',
+                overflowY: 'auto',
+                borderRadius: '6px 0 0 0',
+                backgroundImage: `url(/patternpad5.svg)`,
+                backgroundRepeat: 'repeat'
+            }}
+        >
+            <Paper elevation={0} className='container' style={{ padding: '20px', borderRadius: '8px', height: '90%', width: '90%', backgroundColor: 'transparent', color: '#fff', paddingTop: '20px' }}>
                 {profileDetails && !update && (
                     <div>
 
                         <Grid container alignItems="center" spacing={3}>
                             <Grid item >
-                                <Avatar style={{ width: 200, height: 200, backgroundColor: '#333', marginRight: '30px' }}>
+                                <Avatar style={{ width: 200, height: 200, backgroundColor: 'transparent', marginRight: '30px' }}>
                                     <img src="/profile_pic.png" alt="Profile" style={{ width: '100%', height: '100%' }} />
                                 </Avatar>
                             </Grid>
@@ -227,7 +248,8 @@ const Profile = () => {
                                             style: {
                                                 color: '#fff',
                                                 borderRadius: '20px',
-                                                border: '2px solid grey'
+                                                border: '2px solid grey',
+                                                backgroundColor:'#333'
                                             }
                                         }}
                                         sx={{ mt: 1, mb: 3 }} // Add margin-top for spacing
@@ -254,7 +276,8 @@ const Profile = () => {
                                             style: {
                                                 color: '#fff',
                                                 borderRadius: '20px',
-                                                border: '2px solid grey'
+                                                border: '2px solid grey',
+                                                backgroundColor:'#333'
                                             }
                                         }}
                                         sx={{ mt: 1, mb: 3 }} // Add margin-top for spacing
@@ -282,7 +305,8 @@ const Profile = () => {
                                             style: {
                                                 color: '#fff',
                                                 borderRadius: '20px',
-                                                border: '2px solid grey'
+                                                border: '2px solid grey',
+                                                backgroundColor:'#333'
                                             }
                                         }}
                                         sx={{ mt: 1, mb: 3 }} // Add margin-top for spacing
@@ -314,7 +338,8 @@ const Profile = () => {
                                     style: {
                                         color: '#fff',
                                         borderRadius: '20px',
-                                        border: '2px solid grey'
+                                        border: '2px solid grey',
+                                        backgroundColor:'#333'
                                     }
                                 }}
                                 sx={{ mt: 1, overflowY: 'auto' }} // Add margin-top for spacing

@@ -28,19 +28,19 @@ const userSchema = new Schema<User>({
         required: true,
     },
     connections: [{
-        type: String || Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
     }],
     pendingConnections: [{
-        type: String || Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
     }],
     connectionRequests: [{
-        type: String || Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
     }],
     groupMemberOf: [{
-        type: String || Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'GroupChat',
         required: true
     }],

@@ -29,18 +29,8 @@ export const getUserById = async ({ id }: { id: string }) => {
     const userExists = await UserModel.exists({ _id: id });
     if (userExists) {
         const user = await UserModel.findById(id);
-        // return {
-        //     _id: user?._id,
-        //     name: user?.name,
-        //     username: user?.username,
-        //     email: user?.email,
-        //     bio: user?.bio,
-        //     gender: user?.gender,
-        //     connections: user?.connections?.toString(),
-        //     pendingConnections: user?.pendingConnections?.toString(),
-        //     connectionRequests: user?.connectionRequests?.toString(),
-        //     groupMemberOf: user?.groupMemberOf?.toString()
-        // }
+        console.log(user?.toJSON(), 'json');
+        console.log(user, 'without json');
         return user?.toJSON();
     } else {
         throw new Error('User not found');
@@ -105,13 +95,17 @@ export const connectByIdRequest = async (userId: string, id: string) => {
         }
         else {
             if (user1) {
+                console.log('user1 ok 6e');
                 user1.pendingConnections = user1.pendingConnections || [];
                 user1.pendingConnections.push(id as any);
+                console.log('user1 ok 6e2');
                 await user1.save();
             }
             if (user2) {
+                console.log('user2 ok 6e');
                 user2.connectionRequests = user2.connectionRequests || [];
                 user2.connectionRequests.push(userId as any);
+                console.log('user2 ok 6e2');
                 await user2.save();
             }
             console.log(user1, user2);
@@ -188,6 +182,7 @@ export const getAllNewUsers = async (userId: string) => {
 export const getAllConnections = async (userId: string) => {
     try {
         const user = await UserModel.findById(userId).populate('connections');
+        console.log('use', user);
 
         if (!user) {
             throw new Error('User not found');
@@ -196,7 +191,9 @@ export const getAllConnections = async (userId: string) => {
         const connections = user.connections || [];
         const connectedUsers = await UserModel.find({ _id: { $in: connections } });
 
-        return connectedUsers.map((connectedUser) => connectedUser.toJSON());
+        const friends = connectedUsers.map((connectedUser) => connectedUser.toJSON());
+        console.log(friends);
+        return friends;
     } catch (error: any) {
         throw new Error('Error fetching connections: ' + error.message);
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Divider, TextField, Typography, IconButton } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import styles from './scroll.module.css';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
@@ -19,6 +19,8 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
 
   const [messages, setMessages] = useState<MessageInputWithId[]>([]);
   const [newMessageContent, setNewMessageContent] = useState<string>('');
+
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     GetMessagesUser1User2(session, selectedContact._id).then((response) => {
@@ -89,7 +91,9 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
         </div>
       </div>
       <Divider />
-      <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
+      <div ref={chatContainerRef}
+        className={styles['custom-scroll-container']}
+        style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
         {messages && messages.map((message) => (
           <div
             key={message._id}

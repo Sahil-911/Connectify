@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { createNewGroupService, getGroupNamesByUserId, storeNewMessageInGroup } from "@/server/services/group.service";
+import { createNewGroupService, getGroupMembersByGroupId, getGroupNamesByUserId, storeNewMessageInGroup } from "@/server/services/group.service";
 import { getMessagesGC } from "@/server/services/message.service";
 import { getAllConnectionsNameId, getUserById } from "@/server/services/user.service";
 
@@ -147,6 +147,26 @@ export async function CreateNewGroup(session: SessionInterface, { groupInput }: 
     }
     catch (err: any) {
         console.log('error huhuhuhu', err.message);
+        return { group: null, message: err.message }
+    }
+}
+
+export async function GetGroupMemberDetails(session: SessionInterface, groupId: string) {
+    try {
+        const { id } = verifyToken(session);
+        const group = await getGroupMembersByGroupId(groupId);
+        console.log(group);
+
+        if (group) {
+            console.log(group);
+            return { group, message: 'group fetched successfully' };
+        }
+        else {
+            return { group: null, message: 'group not found' };
+        }
+    }
+    catch (err: any) {
+        console.log('error', err.message);
         return { group: null, message: err.message }
     }
 }

@@ -56,11 +56,12 @@ export default function AddContact() {
     };
 
     return (
-        <Grid container direction="column" style={{ width: '100%'}}>
-            <Grid item sx={{ bgcolor: '#333', p: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center',  borderRadius:'6px 0 0 0' }}>
+        <Grid container direction="column" style={{ width: '100%',height:'100%', backgroundImage: `url(/patternpad4.svg)`,
+        backgroundRepeat: 'repeat', borderRadius:'6px 0 0 0 '}}>
+            <Grid item sx={{ bgcolor: 'transparent', p: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center',  borderRadius:'6px 0 0 0' }}>
                 <Typography variant='h4' style={{ color: '#fff', alignSelf: 'center', paddingTop: '10px' }}>Add Contact</Typography>
             </Grid>
-            <Grid item className={styles['custom-scroll-container']} sx={{ bgcolor: '#333', flex: 1, overflowY: 'auto' }}>
+            <Grid item className={styles['custom-scroll-container']} sx={{ bgcolor: 'transparent', flex: 1, overflowY: 'auto' }}>
                 <TextField
                     fullWidth
                     variant="outlined"
@@ -71,7 +72,8 @@ export default function AddContact() {
                         style: {
                             color: '#fff',
                             borderRadius: '20px',
-                            border: '2px solid grey'
+                            border: '2px solid grey',
+                            backgroundColor: '#333',
                         }
                     }}
                     sx={{ pt: 3, pb: 3, maxWidth: '1050px', margin: 'auto', justifyContent: 'center', display: 'flex' }}

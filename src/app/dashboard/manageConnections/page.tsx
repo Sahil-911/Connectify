@@ -60,7 +60,10 @@ export default function FullWidthTabs() {
     };
 
     return (
-        <Box sx={{ bgcolor: '#333', width: '100%', height: '100%', borderRadius: '6px 0 0 0' }}>
+        <Box sx={{
+            bgcolor: '#333', width: '100%', height: '100%', borderRadius: '6px 0 0 0', backgroundImage: `url(/patternpad4.svg)`,
+            backgroundRepeat: 'repeat'
+        }}>
             <AppBar position="static" sx={{ borderRadius: '6px 0 0 0' }}>
                 <Tabs
                     value={value}

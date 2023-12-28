@@ -25,10 +25,10 @@ export async function GetAllFriends(session: SessionInterface) {
 
         connections.map((connection) => {
             connection._id = connection._id.toString();
-            connection.connections = connection?.connections?.toString().split(',') || [];
-            connection.connectionRequests = connection.connectionRequests?.toString().split(',') || [];
-            connection.pendingConnections = connection.pendingConnections?.toString().split(',') || [];
-            connection.groupMemberOf = connection.groupMemberOf?.toString().split(',') || [];
+            connection.connections = connection.connections?.toString().split(',');
+            connection.connectionRequests = connection.connectionRequests?.toString().split(',');
+            connection.pendingConnections = connection.pendingConnections?.toString().split(',');
+            connection.groupMemberOf = connection.groupMemberOf?.toString().split(',');
         })
 
         console.log(connections);

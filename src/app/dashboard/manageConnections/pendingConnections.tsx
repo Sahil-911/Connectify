@@ -53,7 +53,7 @@ export default function PendingConnections() {
 
     return (
         <Grid container direction="column" style={{ width: '100%', height: '100%' }}>
-            <Grid item sx={{ bgcolor: '#333', p: '1rem', pt: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Grid item sx={{ bgcolor: 'transparent', p: '1rem', pt: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 {/* <Typography variant='h4' style={{ color: '#fff', alignSelf: 'center', paddingTop: '10px' }}>Connections</Typography> */}
                 <TextField
                     fullWidth
@@ -65,13 +65,14 @@ export default function PendingConnections() {
                         style: {
                             color: '#fff',
                             borderRadius: '20px',
-                            border: '2px solid grey'
+                            border: '2px solid grey',
+                            backgroundColor: '#333',
                         }
                     }}
                     sx={{ pt: 3, pb: 3, maxWidth: '1050px', margin: 'auto', justifyContent: 'center', display: 'flex' }}
                 />
             </Grid>
-            <Grid item sx={{ bgcolor: '#333', flex: 1, height: '100%', width: '100%' }}>
+            <Grid item sx={{ bgcolor: 'transparent', flex: 1, height: '100%', width: '100%' }}>
                 <Grid container justifyContent='center' sx={{ height: '100%' }} spacing={2}>
                     {filteredUsers.map((user, index) => (
                         <Grid item key={index}>

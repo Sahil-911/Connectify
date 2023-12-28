@@ -36,7 +36,7 @@ export default function CC() {
 
     return (
         <div style={{ display: 'flex', height: '100%', width: '100%' }}>
-            <div style={{ backgroundColor: '#1f1f1f', color: '#e0e0e0', height: '100%', minWidth: '200px', flex: '1 0 0', width: '100%' }}>
+            <div style={{ backgroundColor: '#1f1f1f', color: '#e0e0e0', height: '100%', minWidth: '280px', flex: '1 0 0', width: '100%' }}>
                 <Contacts onSelectContact={handleContactSelection} />
             </div>
             <div style={{ display: 'flex', flex: '3 0 0', minWidth: '300px', width: '100%' }}>

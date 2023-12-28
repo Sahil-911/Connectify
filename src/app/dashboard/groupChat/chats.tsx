@@ -1,7 +1,7 @@
 'use client';
 
 import { Divider, TextField, Typography, IconButton } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import styles from '@/components/scroll.module.css';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
@@ -9,7 +9,8 @@ import Image from 'next/image';
 import { useAuth } from '@/context/session';
 import { UserInputWithId } from '@/types/User.interface';
 import { MessageInputWithId } from '@/types/Message.interface';
-import { GetMessagesGC, StoreNewMessageInGroup } from './action';
+import { GetGroupMemberDetails, GetMessagesGC, StoreNewMessageInGroup } from './action';
+import StarPurple500RoundedIcon from '@mui/icons-material/StarPurple500Rounded';
 
 function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, name: string }, profile: UserInputWithId }) {
 
@@ -19,8 +20,28 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
 
     const [messages, setMessages] = useState<MessageInputWithId[]>([]);
     const [newMessageContent, setNewMessageContent] = useState<string>('');
-    const [admin, setAdmin] = useState();
-    const [members, setMembers] = useState();
+    const [members, setMembers] = useState<{ id: string, username: string }[]>([]);
+    const [admin, setAdmin] = useState<{ id: string; username: string | undefined }>();
+
+    const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    useEffect(() => {
+        GetGroupMemberDetails(session, selectedGroup._id).then((response) => {
+            console.log(response);
+
+            console.log('member details fetched', response);
+            const fetchedMembers = response.group?.members;
+            const fetchedAdmin = response.group?.admin;
+            setMembers(fetchedMembers || []);
+            setAdmin(fetchedAdmin || { id: '', username: '' });
+        })
+    }, [session, selectedGroup]);
 
     useEffect(() => {
         GetMessagesGC(session, selectedGroup._id).then((response) => {
@@ -52,7 +73,7 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
             const newMessage: MessageInputWithId = {
                 _id: 'temp_id',
                 content: newMessageContent,
-                sender: profile,
+                sender: profile._id,
                 timestamp: new Date(),
             };
 
@@ -95,23 +116,39 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
                         {selectedGroup?.name}
                     </Typography>
                     <Typography variant="caption" sx={{ ml: 1.5, mt: 0, color: '#007bff' }}>
-                        {selectedGroup.name !== '' && `${selectedGroup.name}`}
+                        {members.map((member, index) => (
+                            <span key={member.id}>
+                                {member.username}
+                                {admin && member.username && admin.username &&
+                                    member.username.toString() === admin.username && (
+                                        <React.Fragment>
+                                            <StarPurple500RoundedIcon fontSize='small' sx={{ pt: 1, color: 'yellow' }} />
+                                            {/* &nbsp; */}
+                                        </React.Fragment>
+                                    )}
+                                {index !== members.length - 1 ? ', ' : ''}
+                            </span>
+                        ))}
                     </Typography>
                 </div>
             </div>
             <Divider />
-            <div className={styles['custom-scroll-container']} style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
-                {messages && messages.map((message) => (
+            <div ref={chatContainerRef}
+                className={styles['custom-scroll-container']}
+                style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
+                {messages && messages.map((message, index) => (
                     <div
-                        key={message._id}
+                        key={index}
                         style={{
                             display: 'flex', flexDirection: 'column',
-                            alignItems: message.sender.toString() !== `${profile._id}` ? 'flex-start' : 'flex-end',
+                            alignItems: message.sender === `${profile._id}` ? 'flex-end' : 'flex-start',
                             padding: '10px 15px',
                             width: '100%',
                         }}
                     >
-                        <Typography variant="subtitle2" sx={{ color: '#007bff' }}>{message?.sender?.toString() === `${profile?._id}` ? profile.username : message.sender?.toString()} </Typography>
+                        <Typography variant="subtitle2" sx={{ color: '#007bff' }}>
+                            {members.find(member => member.id === message.sender)?.username || 'Unknown User'}
+                        </Typography>
                         <div style={{
                             backgroundColor: message.sender.toString() !== `${profile._id}` ? '#333' : '#007bff',
                             color: 'white',

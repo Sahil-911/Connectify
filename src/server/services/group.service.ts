@@ -68,7 +68,7 @@ export const storeNewMessageInGroup = async (groupId: string, userId: string, me
 
             // Update the newMessage object with _id and sender as strings
             newMessage._id = newMessage._id.toString();
-            newMessage.sender = userId;
+            newMessage.sender = userId.toString();
 
             return group.toJSON(); // Return the updated group
         } else {
@@ -130,4 +130,41 @@ export const createNewGroupService: (userId: string, groupInput: { name: string,
     }
 };
 
-// export const getGroupDetails = async 
+export const getGroupMembersByGroupId = async (groupId: string) => {
+    try {
+      // Find the group by ID to get its details
+      const group = await GroupChatModel.findById(groupId)
+        .populate('admin', 'username')
+        .populate('participants', 'username');
+  
+      if (!group) {
+        throw new Error('Group not found');
+      }
+  
+      // Extract the necessary information
+      const groupName = group.name;
+      const adminId = group.admin;
+      const adminUsername = await UserModel.findById(adminId, 'username');
+      const admin = {
+        id: adminId.toString(),
+        username: adminUsername?.username
+      };
+  
+      // Fetch details for all participants from UserModel
+      const participantIds = group.participants;
+      const participants = await UserModel.find({ _id: { $in: participantIds } }, 'username');
+  
+      const members = participants.map(participant => ({
+        id: participant._id,
+        username: participant.username
+      }));
+  
+      return {
+        groupName,
+        admin,
+        members
+      };
+    } catch (error) {
+      throw new Error(`Error fetching group members: ${error}`);
+    }
+  };
