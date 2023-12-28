@@ -132,39 +132,53 @@ export const createNewGroupService: (userId: string, groupInput: { name: string,
 
 export const getGroupMembersByGroupId = async (groupId: string) => {
     try {
-      // Find the group by ID to get its details
-      const group = await GroupChatModel.findById(groupId)
-        .populate('admin', 'username')
-        .populate('participants', 'username');
-  
-      if (!group) {
-        throw new Error('Group not found');
-      }
-  
-      // Extract the necessary information
-      const groupName = group.name;
-      const adminId = group.admin;
-      const adminUsername = await UserModel.findById(adminId, 'username');
-      const admin = {
-        id: adminId.toString(),
-        username: adminUsername?.username
-      };
-  
-      // Fetch details for all participants from UserModel
-      const participantIds = group.participants;
-      const participants = await UserModel.find({ _id: { $in: participantIds } }, 'username');
-  
-      const members = participants.map(participant => ({
-        id: participant._id,
-        username: participant.username
-      }));
-  
-      return {
-        groupName,
-        admin,
-        members
-      };
+        // Find the group by ID to get its details
+        const group = await GroupChatModel.findById(groupId)
+            .populate('admin', 'username')
+            .populate('participants', 'username');
+
+        if (!group) {
+            throw new Error('Group not found');
+        }
+
+        // Extract the necessary information
+        const groupName = group.name;
+        const adminId = group.admin;
+        const adminUsername = await UserModel.findById(adminId, 'username');
+        const admin = {
+            id: adminId.toString(),
+            username: adminUsername?.username
+        };
+
+        // Fetch details for all participants from UserModel
+        const participantIds = group.participants;
+        const participants = await UserModel.find({ _id: { $in: participantIds } }, 'username');
+
+        const members = participants.map(participant => ({
+            id: participant._id,
+            username: participant.username
+        }));
+
+        return {
+            groupName,
+            admin,
+            members
+        };
     } catch (error) {
-      throw new Error(`Error fetching group members: ${error}`);
+        throw new Error(`Error fetching group members: ${error}`);
     }
-  };
+};
+
+export const getGroupDescription = async (groupId: string) => {
+    try {
+        const group = await GroupChatModel.findById(groupId);
+        if (group) {
+            return {
+                _id: group._id,
+                description: group.description,
+            };
+        }
+    } catch (err) {
+        throw new Error('Error fetching group description by ID');
+    }
+}

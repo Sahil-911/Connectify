@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { createNewGroupService, getGroupMembersByGroupId, getGroupNamesByUserId, storeNewMessageInGroup } from "@/server/services/group.service";
+import { createNewGroupService, getGroupDescription, getGroupMembersByGroupId, getGroupNamesByUserId, storeNewMessageInGroup } from "@/server/services/group.service";
 import { getMessagesGC } from "@/server/services/message.service";
 import { getAllConnectionsNameId, getUserById } from "@/server/services/user.service";
 
@@ -168,5 +168,52 @@ export async function GetGroupMemberDetails(session: SessionInterface, groupId: 
     catch (err: any) {
         console.log('error', err.message);
         return { group: null, message: err.message }
+    }
+}
+
+export async function GetGroupDescription(session: SessionInterface, groupId: string) {
+    try {
+        const { id } = verifyToken(session);
+        if (!id) throw new Error('Invalid token');
+
+        const group = await getGroupDescription(groupId);
+        console.log(group);
+
+        if (group) {
+            group._id = group._id.toString();
+            console.log(group);
+            return { group, message: 'group fetched successfully' };
+        }
+        else {
+            return { group: null, message: 'group not found' };
+        }
+
+    }
+    catch (err: any) {
+        console.log('error', err.message);
+        return { group: null, message: err.message }
+    }
+}
+
+export async function FetchProfileDetails(id: string) {
+    try {
+        const profile = await getUserById({ id });
+        console.log(profile);
+        if (profile)
+            console.log('to pa6i hu 6e', profile)
+        return {
+            profile: {
+                _id: profile?._id.toString(),
+                username: profile?.username,
+                name: profile?.name,
+                email: profile?.email,
+                bio: profile?.bio,
+                gender: profile?.gender
+            }, message: 'profile fetched successfully'
+        };
+    }
+    catch (err: any) {
+        console.log('error', err.message);
+        return { profile: null, message: err.message }
     }
 }

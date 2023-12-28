@@ -11,12 +11,15 @@ import { UserInputWithId } from '@/types/User.interface';
 import { MessageInputWithId } from '@/types/Message.interface';
 import { GetGroupMemberDetails, GetMessagesGC, StoreNewMessageInGroup } from './action';
 import StarPurple500RoundedIcon from '@mui/icons-material/StarPurple500Rounded';
+import GroupDetailsModal from './groupDetailsModal';
 
 function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, name: string }, profile: UserInputWithId }) {
 
     const { session } = useAuth();
 
     console.log(selectedGroup);
+
+    const [openModal, setOpenModal] = useState(false);
 
     const [messages, setMessages] = useState<MessageInputWithId[]>([]);
     const [newMessageContent, setNewMessageContent] = useState<string>('');
@@ -39,6 +42,8 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
             const fetchedMembers = response.group?.members;
             const fetchedAdmin = response.group?.admin;
             setMembers(fetchedMembers || []);
+            // sort by username
+            fetchedMembers?.sort((a, b) => a.username.localeCompare(b.username));
             setAdmin(fetchedAdmin || { id: '', username: '' });
         })
     }, [session, selectedGroup]);
@@ -88,6 +93,13 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
         console.log(profileId);
     }
 
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+    };
 
     console.log(selectedGroup._id, 's');
     console.log(profile, 'p');
@@ -104,7 +116,7 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
             height: '100%',
 
         }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', height: '64px' }}>
+            <div onClick={handleOpenModal} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-start', height: '64px' }}>
                 {selectedGroup._id !== '' && (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', marginLeft: '10px' }}>
                     <Image
                         src='/profile_pic.png' // Use the avatar property from contact
@@ -214,6 +226,9 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
                     </div>
                 </div>
             </form>
+            {openModal && (
+                <GroupDetailsModal admin={admin} members={members} selectedGroup={selectedGroup} onClose={handleCloseModal} />
+            )}
         </div>
     );
 }
