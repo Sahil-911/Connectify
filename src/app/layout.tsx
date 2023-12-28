@@ -27,6 +27,7 @@ export default function RootLayout({
       <head>
         <title>chat-app</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/CycloneIcon.svg" type="image/x-icon" />
       </head>
       <body>
         <ThemeProvider theme={theme}>
