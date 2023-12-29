@@ -3,7 +3,7 @@
 
 ## Features
 - Real-Time Communication: Instant messaging in real-time.
-- Multiple Chat Rooms: Create or join various chat rooms.
+- Multiple Group Chats: Create verious groups and chat with your connections.
 - User Authentication: Secure authentication system for user identification.
 - Responsive Design: Compatible with various devices and screen sizes.
 
@@ -12,6 +12,7 @@
 - React: JavaScript library for building user interfaces.
 - Node.js: JavaScript runtime environment.
 - Express: Web application framework for Node.js.
+- MongoDB: NoSQL database used for storing application data.
 - Material-UI: React components for a customizable user interface.
 
 ## Live Demo
