@@ -1,9 +1,9 @@
 # <img src="https://github.com/Sahil-911/Connectify/blob/master/public/CycloneIcon.svg" alt="Connectify Logo" width="30" height="30"> Connectify
-### Connectify is a real-time secure chat application built using Next.js. It allows users to communicate in real-time through contacts and groups.
+### Connectify is a chat application built using Next.js that facilitates communication among users in near real-time through contacts and groups.
 
 ## Features
-- Real-Time Communication: Instant messaging in real-time.
-- Multiple Group Chats: Create verious groups and chat with your connections.
+- Near Real-Time Communication: Facilitates communication with revalidated updates fetched periodically (every 5 seconds).
+- Multiple Group Chats: Create various groups and chat with your connections.
 - User Authentication: Secure authentication system for user identification.
 - Responsive Design: Compatible with various devices and screen sizes.
 
@@ -18,4 +18,3 @@
 ## Live Demo
 
 Check out the live deployment of Connectify: [Connectify](https://connectify-zeta.vercel.app/)
-
