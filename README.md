@@ -1,4 +1,4 @@
-# Connectify
+# <img src="https://github.com/Sahil-911/Connectify/blob/master/public/CycloneIcon.svg" alt="Connectify Logo" width="30" height="30"> Connectify
 ### Connectify is a real-time secure chat application built using Next.js. It allows users to communicate in real-time through contacts and groups.
 
 ## Features
