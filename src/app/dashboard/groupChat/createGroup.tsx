@@ -45,8 +45,8 @@ export default function CreateGroup({ onGroupCreated, setGroups }: { onGroupCrea
                     GetNameOfGroups(session)
                         .then((response) => {
                             console.log(response);
-                            const fetchedGroups = JSON.parse(response.groupNames || '[]');
-                            setGroups(fetchedGroups);
+                            const fetchedGroups = response.groupNames || []; // Use empty array as default if groupNames is null/undefined
+                            setGroups(fetchedGroups)
                         })
                         .catch((error) => {
                             console.error('Error fetching groups:', error);
