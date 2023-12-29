@@ -48,14 +48,21 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
         })
     }, [session, selectedGroup]);
 
-    useEffect(() => {
-        GetMessagesGC(session, selectedGroup._id).then((response) => {
-            console.log(response);
+    const fetchMessages = async () => {
+        const response = await GetMessagesGC(session, selectedGroup._id);
+        if (response && response.messages) {
+            setMessages(response.messages || []);
+        }
+    };
 
-            console.log('chats fetched', response);
-            const fetchedMessages = response.messages;
-            setMessages(fetchedMessages || []);
-        })
+    useEffect(() => {
+        fetchMessages(); // Initial data fetch
+
+        const interval = setInterval(() => {
+            fetchMessages(); // Fetch data at intervals
+        }, 5000); // Fetch every 60 seconds
+
+        return () => clearInterval(interval); // Cleanup interval on unmount
     }, [session, selectedGroup]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

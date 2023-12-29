@@ -22,15 +22,33 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    GetMessagesUser1User2(session, selectedContact._id).then((response) => {
-      console.log(response);
+  // useEffect(() => {
+  //   GetMessagesUser1User2(session, selectedContact._id).then((response) => {
+  //     console.log(response);
 
-      console.log('chats fetched', response);
-      const fetchedMessages = response.chats;
-      setMessages(fetchedMessages || []);
-    })
+  //     console.log('chats fetched', response);
+  //     const fetchedMessages = response.chats;
+  //     setMessages(fetchedMessages || []);
+  //   })
+  // }, [session, selectedContact]);
+
+  const fetchMessages = async () => {
+    const response = await GetMessagesUser1User2(session, selectedContact._id);
+    if (response && response.chats) {
+      setMessages(response.chats || []);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages(); // Initial data fetch
+
+    const interval = setInterval(() => {
+      fetchMessages(); // Fetch data at intervals
+    }, 5000); // Fetch every 60 seconds
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [session, selectedContact]);
+
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessageContent(event.target.value); // Update the state with the content of the input field

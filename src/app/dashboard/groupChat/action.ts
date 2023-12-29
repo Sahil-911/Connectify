@@ -154,6 +154,7 @@ export async function CreateNewGroup(session: SessionInterface, { groupInput }: 
 export async function GetGroupMemberDetails(session: SessionInterface, groupId: string) {
     try {
         const { id } = verifyToken(session);
+        if (!id) throw new Error('Invalid token');
         const group = await getGroupMembersByGroupId(groupId);
         console.log(group);
 

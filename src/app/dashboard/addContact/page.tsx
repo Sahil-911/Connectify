@@ -56,9 +56,11 @@ export default function AddContact() {
     };
 
     return (
-        <Grid container direction="column" style={{ width: '100%',height:'100%', backgroundImage: `url(/patternpad4.svg)`,
-        backgroundRepeat: 'repeat', borderRadius:'6px 0 0 0 '}}>
-            <Grid item sx={{ bgcolor: 'transparent', p: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center',  borderRadius:'6px 0 0 0' }}>
+        <Grid container direction="column" style={{
+            width: '100%', height: '100%', backgroundImage: `url(/patternpad4.svg)`,
+            backgroundRepeat: 'repeat', borderRadius: '6px 0 0 0 '
+        }}>
+            <Grid item sx={{ bgcolor: 'transparent', p: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRadius: '6px 0 0 0' }}>
                 <Typography variant='h4' style={{ color: '#fff', alignSelf: 'center', paddingTop: '10px' }}>Add Contact</Typography>
             </Grid>
             <Grid item className={styles['custom-scroll-container']} sx={{ bgcolor: 'transparent', flex: 1, overflowY: 'auto' }}>
