@@ -3,6 +3,7 @@ import { GroupChatModel } from "../models/GroupChat.model";
 import { UserModel } from "../models/User.model";
 import { createMessage } from "./message.service";
 import { MessageInputWithId } from "@/types/Message.interface";
+import { MessageModel } from "../models/Message.model";
 
 export const getGroupNameById = async (groupId: string) => {
     try {
@@ -47,6 +48,55 @@ export const getGroupNamesByUserId = async (userId: string) => {
     }
 };
 
+export const getGroupNamesWithLatestMessages = async (userId: string) => {
+    try {
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const groupNamesWithMessages = await Promise.all(
+            (user.groupMemberOf || []).map(async (groupId) => {
+                try {
+                    const groupName = await getGroupNameById(groupId.toString());
+                    const latestMessage = await getLatestMessageForGroup(groupId.toString());
+
+                    return { groupName, latestMessage };
+                } catch (error) {
+                    console.error(`Error fetching group info for group ID: ${groupId}`, error);
+                    return null;
+                }
+            })
+        );
+
+        const filteredGroups = groupNamesWithMessages.filter(Boolean); // Filter out null values (error occurred for specific groups)
+        const sortedGroups = filteredGroups.sort((a, b) => {
+            const timestampA = a?.latestMessage?.timestamp?.getTime() || 0;
+            const timestampB = b?.latestMessage?.timestamp?.getTime() || 0;
+
+            return timestampB - timestampA; // Sort based on the numeric representation of dates for descending order
+        });
+
+        return sortedGroups.map((group) => group?.groupName); // Return only group names
+    } catch (err) {
+        throw new Error('Error fetching group names with latest messages');
+    }
+};
+
+export const getLatestMessageForGroup = async (groupId: string) => {
+    const group = await GroupChatModel.findById(groupId);
+    const lastMessageId = group?.messages[group?.messages.length - 1];
+
+    if (!lastMessageId)
+        return null;
+
+    const lastMessage = await MessageModel.findById(lastMessageId);
+
+    let content = lastMessage?.content;
+    let timestamp = lastMessage?.timestamp;
+
+    return { content, timestamp };
+}
 
 export const storeNewMessageInGroup = async (groupId: string, userId: string, message: string) => {
     try {

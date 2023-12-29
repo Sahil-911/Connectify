@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { storeNewMessageInContact } from "@/server/services/contact.service";
+import { getLatestMessageForContact, storeNewMessageInContact } from "@/server/services/contact.service";
 import { getMessagesUser1User2 } from "@/server/services/message.service";
 import { connectByIdRequest, disconnectByIdWithdrawal, getNameOfConnections, getUserById } from "@/server/services/user.service";
 
@@ -67,6 +67,24 @@ export async function DisconnectById(session: SessionInterface, id: string) {
     }
 }
 
+// export async function GetNameOfConnections(session: SessionInterface) {
+//     console.log('getting names of connections...');
+//     try {
+//         const { id: userId } = verifyToken(session);
+//         if (!userId) throw new Error('Invalid token');
+//         const contacts: { _id: any; name: any; username: any; }[] = await getNameOfConnections(userId);
+//         console.log('contacts');
+//         contacts.forEach(contact => {
+//             contact._id = contact._id.toString();
+//         });
+//         return { contacts, message: 'contacts fetched successfully' };
+//     }
+//     catch (err: any) {
+//         console.log('error', err.message)
+//         return { message: err.message }
+//     }
+// }
+
 export async function GetNameOfConnections(session: SessionInterface) {
     console.log('getting names of connections...');
     try {
@@ -74,16 +92,55 @@ export async function GetNameOfConnections(session: SessionInterface) {
         if (!userId) throw new Error('Invalid token');
         const contacts: { _id: any; name: any; username: any; }[] = await getNameOfConnections(userId);
         console.log('contacts');
-        contacts.forEach(contact => {
-            contact._id = contact._id.toString();
+
+        // Retrieve the latest message for each contact
+        const contactsWithLatestMessages = await Promise.all(
+            contacts.map(async (contact) => {
+                try {
+                    const latestMessage = await getLatestMessageForContact(userId, contact._id);
+                    return {
+                        _id: contact._id.toString(),
+                        name: contact.name,
+                        username: contact.username,
+                        latestMessage: latestMessage ? latestMessage : null
+                    };
+                } catch (error) {
+                    // Handle errors while fetching the latest message for a contact
+                    return {
+                        _id: contact._id.toString(),
+                        name: contact.name,
+                        username: contact.username,
+                        latestMessage: null
+                    };
+                }
+            })
+        );
+
+        // Sort contacts based on the timestamp of the latest message (if available)
+        const sortedContacts = contactsWithLatestMessages.sort((a, b) => {
+            const timestampA = a.latestMessage?.timestamp?.getTime() || 0;
+            const timestampB = b.latestMessage?.timestamp?.getTime() || 0;
+
+            return timestampB - timestampA; // Sort in descending order based on the timestamp
         });
-        return { contacts, message: 'contacts fetched successfully' };
-    }
-    catch (err: any) {
-        console.log('error', err.message)
-        return { message: err.message }
+
+        // Extract only the content of the last message for each contact
+        const contactsContent = sortedContacts.map((contact) => {
+            return {
+                _id: contact._id,
+                name: contact.name,
+                username: contact.username,
+                latestMessage: contact.latestMessage ? contact.latestMessage.content : null
+            };
+        });
+
+        return { contacts: contactsContent, message: 'contacts fetched successfully' };
+    } catch (err: any) {
+        console.log('error', err.message);
+        return { message: err.message };
     }
 }
+
 
 export async function GetMessagesUser1User2(session: SessionInterface, id: string) {
     console.log('getting messages between user1 and user2...');

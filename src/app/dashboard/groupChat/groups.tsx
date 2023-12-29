@@ -10,11 +10,14 @@ import { useAuth } from '@/context/session';
 import { Add } from '@mui/icons-material';
 import CreateGroup from './createGroup';
 
-const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name: string, username: string }) => void }) => {
+const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name: string }) => void }) => {
 
     const { session } = useAuth();
 
-    const [groups, setGroups] = useState<{ _id: string, name: string, username: string }[]>([]);
+    const [groups, setGroups] = useState<({
+        _id: string;
+        name: string;
+    } | undefined)[]>([]);
 
     const [openModal, setOpenModal] = useState(false);
 
@@ -23,13 +26,14 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
         GetNameOfGroups(session)
             .then((response) => {
                 console.log(response);
-                const fetchedGroups = JSON.parse(response.groupNames || '[]');
-                setGroups(fetchedGroups);
+                const fetchedGroups = response.groupNames || []; // Use empty array as default if groupNames is null/undefined
+                setGroups(fetchedGroups)
             })
             .catch((error) => {
                 console.error('Error fetching groups:', error);
             });
     }, [session]);
+
 
 
     const handleModalOpen = () => {
@@ -64,7 +68,10 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
             <div className={styles['custom-scroll-container']} style={{ height: '90%', overflowY: 'scroll' }}>
                 {groups.map((group, index) => (
                     <Paper key={index} elevation={0}
-                        onClick={() => onSelectGroup(group)}
+                        onClick={() => {
+                            if (group)
+                                onSelectGroup(group)
+                        }}
                         sx={{
                             bgcolor: '#262626',
                             color: '#fff',
@@ -79,7 +86,7 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                 <Image
                                     src='/profile_pic.png' // Use the avatar property from group
-                                    alt={group.name}
+                                    alt={group?.name || ''}
                                     width={50}
                                     height={50}
                                     style={{ borderRadius: '50%', margin: '0 auto' }}
@@ -87,10 +94,10 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
                             </div>
                             <div>
                                 <Typography variant="body1" sx={{ ml: 2, my: 'auto' }}>
-                                    {group.name}
+                                    {group?.name}
                                 </Typography>
                                 <Typography variant="caption" sx={{ ml: 2, my: 'auto', color: '#007bff' }}>
-                                    @{group.username}
+                                    @{group?.name}
                                 </Typography>
                             </div>
                         </div>

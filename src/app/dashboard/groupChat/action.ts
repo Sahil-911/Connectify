@@ -2,7 +2,7 @@
 
 import { SessionInterface } from "@/context/session";
 import { verifyToken } from "@/server/services/auth.service";
-import { createNewGroupService, getGroupDescription, getGroupMembersByGroupId, getGroupNamesByUserId, storeNewMessageInGroup } from "@/server/services/group.service";
+import { createNewGroupService, getGroupDescription, getGroupMembersByGroupId, getGroupNamesByUserId, getGroupNamesWithLatestMessages, storeNewMessageInGroup } from "@/server/services/group.service";
 import { getMessagesGC } from "@/server/services/message.service";
 import { getAllConnectionsNameId, getUserById } from "@/server/services/user.service";
 
@@ -35,25 +35,21 @@ export async function FetchProfile(session: SessionInterface) {
     }
 }
 
-export async function GetNameOfGroups(session: SessionInterface) {
+export const GetNameOfGroups = async (session: SessionInterface) => {
     try {
         const { id } = verifyToken(session);
-        const groupNames = await getGroupNamesByUserId(id);
-        console.log(groupNames);
+        const groupNames = await getGroupNamesWithLatestMessages(id);
 
         if (groupNames) {
-            console.log(groupNames);
-            return { groupNames, message: 'groupNames fetched successfully' };
-        }
-        else {
+            return { groupNames, message: 'Group names fetched successfully' };
+        } else {
             return { groupNames: null, message: 'No groups found' };
         }
+    } catch (err: any) {
+        console.error('Error:', err.message);
+        return { groupNames: null, message: err.message };
     }
-    catch (err: any) {
-        console.log('error', err.message);
-        return { groups: null, message: err.message }
-    }
-}
+};
 
 export async function GetMessagesGC(session: SessionInterface, groupId: string) {
     try {

@@ -12,15 +12,20 @@ const Contacts = ({ onSelectContact }: { onSelectContact: (contact: { _id: strin
 
     const { session } = useAuth();
 
-    const [contacts, setContacts] = useState<{ _id: string, name: string, username: string }[]>([]);
+    const [contacts, setContacts] = useState<{
+        _id: any;
+        name: any;
+        username: any;
+        latestMessage: string | null;
+    }[]>([]);
 
     useEffect(() => {
         // get contacts 
         GetNameOfConnections(session)
             .then((response) => {
                 console.log(response);
-                const fetchedContacts = response.contacts as { _id: string, name: string, username: string }[] || [];
-                setContacts(fetchedContacts);
+                const fetchedContacts = response.contacts;
+                setContacts(fetchedContacts || []);
             })
             .catch((error) => {
                 console.error('Error fetching contacts:', error);
