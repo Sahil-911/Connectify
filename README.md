@@ -18,3 +18,19 @@
 ## Live Demo
 
 Check out the live deployment of Connectify: [Connectify](https://connectify-zeta.vercel.app/)
+
+## Installation
+
+Clone the repository and install the dependencies.
+
+```bash
+git clone https://github.com/Sahil-911/Connectify.git
+cd Connectify
+npm install
+```
+
+## Usage
+
+```bash
+npm run dev
+```
