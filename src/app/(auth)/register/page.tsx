@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Grid, Typography, TextField, Button, Paper, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Grid, Typography, TextField, Button, Paper, RadioGroup, FormControlLabel, Radio, CircularProgress } from '@mui/material';
 import CycloneIcon from '@mui/icons-material/Cyclone';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -29,8 +29,8 @@ const inputStyles = {
 };
 
 const RegisterPage = () => {
-    const router = useRouter();
 
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -54,7 +54,7 @@ const RegisterPage = () => {
         },
         validationSchema: formSchema,
         onSubmit: (values, { setFieldError }) => {
-            console.log(values);
+            setLoading(true); // Set loading to true during registration attempt
             postUser({
                 user_input: {
                     name: values.fullName,
@@ -65,11 +65,11 @@ const RegisterPage = () => {
                 }
             })
                 .then((res) => {
+                    setLoading(false); // Reset loading state after registration attempt
                     if (res.user) {
                         router.push("/login");
                         toast.success('Account created successfully');
-                    }
-                    else {
+                    } else {
                         setFieldError('gender', res.message);
                         toast.error(res.message);
                     }
@@ -286,8 +286,34 @@ const RegisterPage = () => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             {/* Submit button */}
-                            <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
-                                Sign up
+                            <Button
+                                type="submit"
+                                variant='outlined'
+                                fullWidth
+                                disabled={loading} // Disable button when loading
+                                style={{
+                                    marginBottom: '10px',
+                                    marginTop: '15px',
+                                    backgroundColor: '#007bff',
+                                    color: '#1f1f1f',
+                                    borderRadius: '20px',
+                                    height: '40px',
+                                    position: 'relative',
+                                }}
+                            >
+                                {loading && (
+                                    <CircularProgress
+                                        size={24}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '50%',
+                                            top: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            color: '#1f1f1f', // Set color of CircularProgress
+                                        }}
+                                    />
+                                )}
+                                <span style={{ visibility: loading ? 'hidden' : 'visible' }}>Sign up</span>
                             </Button>
                             <Link href="/login" style={{ textDecoration: 'none', color: '#007bff', fontSize: '12px' }}>
                                 Already have an account? Log in

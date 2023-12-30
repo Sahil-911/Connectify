@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Grid, Typography, TextField, Button, Paper } from '@mui/material';
+import { Grid, Typography, TextField, Button, Paper, CircularProgress } from '@mui/material';
 import CycloneIcon from '@mui/icons-material/Cyclone';
 import Link from 'next/link';
 import { useFormik } from 'formik';
@@ -32,6 +32,7 @@ const inputStyles = {
 const LoginPage = () => {
     const { login } = useAuth();
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     // const [username, setUsername] = useState('');
     // const [password, setPassword] = useState('');
@@ -48,16 +49,17 @@ const LoginPage = () => {
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
+            setLoading(true); // Set loading to true during login attempt
             login(values).then((res) => {
+                setLoading(false); // Reset loading state after login attempt
                 if (!res.session) {
-                    // alert(res.message);
                     console.log(res.message);
                     toast.error(res.message);
                     return;
-                }
-                else {
+                } else {
                     console.log('Logged in successfully!')
-                    // toast.success('Logged in successfully!');
+                    // Display success message and navigate to another page
+                    toast.success('Logged in successfully!');
                     router.push('/dashboard');
                 }
             });
@@ -136,8 +138,34 @@ const LoginPage = () => {
                                 style={inputStyles}
                             />
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Button type="submit" variant='outlined' fullWidth style={{ marginBottom: '10px', marginTop: '15px', backgroundColor: '#007bff', color: '#1f1f1f', borderRadius: '20px', height: '40px' }}>
-                                    Log in
+                                <Button
+                                    type="submit"
+                                    variant='outlined'
+                                    fullWidth
+                                    disabled={loading} // Disable button when loading
+                                    style={{
+                                        marginBottom: '10px',
+                                        marginTop: '15px',
+                                        backgroundColor: '#007bff',
+                                        color: '#1f1f1f',
+                                        borderRadius: '20px',
+                                        height: '40px',
+                                        position: 'relative'
+                                    }}
+                                >
+                                    {loading && (
+                                        <CircularProgress
+                                            size={24}
+                                            style={{
+                                                position: 'absolute',
+                                                left: '50%',
+                                                top: '50%',
+                                                transform: 'translate(-50%, -50%)',
+                                                color: '#1f1f1f' // Set color of CircularProgress
+                                            }}
+                                        />
+                                    )}
+                                    <span style={{ visibility: loading ? 'hidden' : 'visible' }}>{loading ? 'Logging in...' : 'Log in'}</span>
                                 </Button>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '12px' }}>
                                     <Link href="/register" style={{ textDecoration: 'none', color: '#007bff', marginLeft: '5px' }} passHref>
