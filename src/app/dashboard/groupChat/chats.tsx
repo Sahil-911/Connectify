@@ -1,6 +1,6 @@
 'use client';
 
-import { Divider, TextField, Typography, IconButton } from '@mui/material';
+import { Divider, TextField, Typography, IconButton, CircularProgress } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import styles from '@/components/scroll.module.css';
@@ -14,53 +14,53 @@ import StarPurple500RoundedIcon from '@mui/icons-material/StarPurple500Rounded';
 import GroupDetailsModal from './groupDetailsModal';
 
 function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, name: string }, profile: UserInputWithId }) {
-
     const { session } = useAuth();
 
-    console.log(selectedGroup);
-
     const [openModal, setOpenModal] = useState(false);
-
     const [messages, setMessages] = useState<MessageInputWithId[]>([]);
     const [newMessageContent, setNewMessageContent] = useState<string>('');
     const [members, setMembers] = useState<{ id: string, username: string }[]>([]);
     const [admin, setAdmin] = useState<{ id: string; username: string | undefined }>();
+    const [lastMessageId, setLastMessageId] = useState<string | null>(null);
+    const [loadingChats, setLoadingChats] = useState(true);
 
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
+    const previousMessagesLength = useRef<number>(0);
 
     useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        if (messages.length !== previousMessagesLength.current) {
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+            previousMessagesLength.current = messages.length;
         }
     }, [messages]);
 
     useEffect(() => {
-        GetGroupMemberDetails(session, selectedGroup._id).then((response) => {
-            console.log(response);
-
-            console.log('member details fetched', response);
-            const fetchedMembers = response.group?.members;
-            const fetchedAdmin = response.group?.admin;
-            setMembers(fetchedMembers || []);
-            // sort by username
-            fetchedMembers?.sort((a, b) => a.username.localeCompare(b.username));
-            setAdmin(fetchedAdmin || { id: '', username: '' });
-        })
+        setLoadingChats(true);
+        GetGroupMemberDetails(session, selectedGroup._id)
+            .then((response) => {
+                const fetchedMembers = response.group?.members;
+                const fetchedAdmin = response.group?.admin;
+                setMembers(fetchedMembers || []);
+                fetchedMembers?.sort((a, b) => a.username.localeCompare(b.username));
+                setAdmin(fetchedAdmin || { id: '', username: '' });
+            })
+            .finally(() => setLoadingChats(false));
     }, [session, selectedGroup]);
 
-    const fetchMessages = async () => {
-        const response = await GetMessagesGC(session, selectedGroup._id);
-        if (response && response.messages) {
-            setMessages(response.messages || []);
-        }
-    };
-
     useEffect(() => {
+        const fetchMessages = async () => {
+            const response = await GetMessagesGC(session, selectedGroup._id);
+            if (response && response.messages) {
+                handleMessagesUpdate(response.messages || []);
+            }
+        };
         fetchMessages(); // Initial data fetch
 
         const interval = setInterval(() => {
             fetchMessages(); // Fetch data at intervals
-        }, 5000); // Fetch every 60 seconds
+        }, 5000); // Fetch every 5 seconds
 
         return () => clearInterval(interval); // Cleanup interval on unmount
     }, [session, selectedGroup]);
@@ -69,30 +69,29 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
         setNewMessageContent(event.target.value); // Update the state with the content of the input field
     };
 
+    const handleMessagesUpdate = (updatedMessages: MessageInputWithId[]) => {
+        if(updatedMessages.length === 0) return;
+        const lastUpdatedMessage = updatedMessages[updatedMessages.length - 1];
+        if (lastMessageId==='' || (lastUpdatedMessage && lastUpdatedMessage._id !== lastMessageId)) {
+            setMessages(updatedMessages);
+            setLastMessageId(lastUpdatedMessage._id);
+        }
+    };
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        console.log('submitting message', newMessageContent);
-
         try {
             await StoreNewMessageInGroup(session, selectedGroup._id, newMessageContent);
-            console.log('message sent');
-
-            // Clear input field after sending the message
             setNewMessageContent('');
 
-            // Add the new message to the messages list
-            const newMessage: MessageInputWithId = {
-                _id: 'temp_id',
-                content: newMessageContent,
-                sender: profile._id,
-                timestamp: new Date(),
-            };
-
-            setMessages(prevMessages => [...prevMessages, newMessage]);
+            const response = await GetMessagesGC(session, selectedGroup._id);
+            if (response && response.messages) {
+                const updatedMessages = response.messages || [];
+                handleMessagesUpdate(updatedMessages);
+            }
         } catch (error) {
             console.error('Error sending message:', error);
-            // Handle errors accordingly
         }
     };
 
@@ -108,8 +107,6 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
         setOpenModal(false);
     };
 
-    console.log(selectedGroup._id, 's');
-    console.log(profile, 'p');
     return (
         <div style={{
             backgroundColor: '#262626',
@@ -121,7 +118,6 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
             justifyContent: 'space-between',
             width: '100%',
             height: '100%',
-
         }}>
             <div onClick={handleOpenModal} style={{ cursor: 'pointer', display: 'flex', alignItems: 'flex-start', height: '64px' }}>
                 {selectedGroup._id !== '' && (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', marginLeft: '10px' }}>
@@ -154,38 +150,49 @@ function GroupChats({ selectedGroup, profile }: { selectedGroup: { _id: string, 
                 </div>
             </div>
             <Divider />
-            <div ref={chatContainerRef}
-                className={styles['custom-scroll-container']}
-                style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad.svg)`, backgroundRepeat: 'repeat' }}>
-                {messages && messages.map((message, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            display: 'flex', flexDirection: 'column',
-                            alignItems: message.sender === `${profile._id}` ? 'flex-end' : 'flex-start',
-                            padding: '10px 15px',
-                            width: '100%',
-                        }}
-                    >
-                        <Typography variant="subtitle2" sx={{ color: '#007bff' }}>
-                            {members.find(member => member.id === message.sender)?.username || 'Unknown User'}
-                        </Typography>
-                        <div style={{
-                            backgroundColor: message.sender.toString() !== `${profile._id}` ? '#333' : '#007bff',
-                            color: 'white',
-                            borderRadius: '10px',
-                            padding: '8px 12px',
-                            marginTop: '5px',
-                            maxWidth: '90%',
-                        }}>
-                            <Typography variant="body1">{message.content}</Typography>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Typography variant="caption" sx={{ color: 'lightgray', textAlign: 'right', fontStyle: 'italic' }}>{new Date(message.timestamp).toLocaleString()}</Typography>
+            {loadingChats ? (
+                <div style={{ display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center', height: '100%', backgroundImage: `url(/patternpad6.svg)`, backgroundRepeat: 'repeat' }}>
+                    <CircularProgress sx={{color:'#007bff'}} />
+                    <Typography variant="body1" sx={{ color: '#007bff' }}>Fetching chats...</Typography>
+                </div>
+            ) : messages.length === 0 ? (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', backgroundImage: `url(/patternpad6.svg)`, backgroundRepeat: 'repeat' }}>
+                    <Typography variant="body1" sx={{color:'#007bff'}}>No messages to display</Typography>
+                </div>
+            ) : (
+                <div ref={chatContainerRef}
+                    className={styles['custom-scroll-container']}
+                    style={{ overflowY: 'auto', height: '100%', backgroundImage: `url(/patternpad6.svg)`, backgroundRepeat: 'repeat' }}>
+                    {messages && messages.map((message, index) => (
+                        <div
+                            key={index}
+                            style={{
+                                display: 'flex', flexDirection: 'column',
+                                alignItems: message.sender === `${profile._id}` ? 'flex-end' : 'flex-start',
+                                padding: '10px 15px',
+                                width: '100%',
+                            }}
+                        >
+                            <Typography variant="subtitle2" sx={{ color: '#007bff' }}>
+                                {members.find(member => member.id === message.sender)?.username || 'Unknown User'}
+                            </Typography>
+                            <div style={{
+                                backgroundColor: message.sender.toString() !== `${profile._id}` ? '#333' : '#007bff',
+                                color: 'white',
+                                borderRadius: '10px',
+                                padding: '8px 12px',
+                                marginTop: '5px',
+                                maxWidth: '90%',
+                            }}>
+                                <Typography variant="body1">{message.content}</Typography>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Typography variant="caption" sx={{ color: 'lightgray', textAlign: 'right', fontStyle: 'italic' }}>{new Date(message.timestamp).toLocaleString()}</Typography>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div style={{
                     height: '100%',

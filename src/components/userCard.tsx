@@ -11,7 +11,9 @@ const UserCard = ({ profileDetails, currentUser }: { profileDetails: UserInputWi
 
     const { session } = useAuth();
 
-    // console.log(currentUser);
+    // console.log('curr',currentUser);
+    // console.log('prof',profileDetails);
+    // console.log('here');
 
     const [openModal, setOpenModal] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'Connect' | 'Requested' | 'Withdraw'>('Connect');

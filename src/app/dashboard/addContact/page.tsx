@@ -25,13 +25,24 @@ export default function AddContact() {
         GetAllProfiles(session)
             .then((response) => {
                 setLoading(false); // Set loading to false after fetching profiles
-                console.log(response);
+                console.log('res...', response);
                 const fetchedUsers = response?.profiles as UserInputWithId[] || [];
-                // setUsers(fetchedUsers as UserInputWithId[]);
+                setUsers(fetchedUsers as UserInputWithId[]);
             })
             .catch((error) => {
                 setLoading(false); // Set loading to false in case of an error
                 console.error('Error fetching profiles:', error);
+            });
+            FetchProfile(session)
+            .then((response) => {
+                console.log('res', response);
+                const profile = response?.profile;
+                if (!profile) {
+                    console.log('no profile');
+                } else {
+                    console.log(profile, 'pro');
+                    setCurrentUser(profile as any);
+                }
             });
     }, [session]);
 
@@ -41,6 +52,8 @@ export default function AddContact() {
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    console.log('filteredUsers', filteredUsers);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);

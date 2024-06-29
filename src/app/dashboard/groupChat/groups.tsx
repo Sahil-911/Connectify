@@ -3,7 +3,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Typography, Divider, Paper, Button, Modal, Box, TextField } from '@mui/material';
+import { Typography, Divider, Paper, Button, Modal, Box, TextField, LinearProgress } from '@mui/material';
 import styles from '@/components/scroll.module.css'; // Import the CSS module
 import { GetNameOfGroups } from './action';
 import { useAuth } from '@/context/session';
@@ -18,7 +18,7 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
         _id: string;
         name: string;
     } | undefined)[]>([]);
-
+    const [loading, setLoading] = useState<boolean>(true);
     const [openModal, setOpenModal] = useState(false);
 
     useEffect(() => {
@@ -26,15 +26,15 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
         GetNameOfGroups(session)
             .then((response) => {
                 console.log(response);
-                const fetchedGroups = response.groupNames || []; // Use empty array as default if groupNames is null/undefined
-                setGroups(fetchedGroups)
+                const fetchedGroups = response.groupNames || [];
+                setGroups(fetchedGroups);
+                setLoading(false); // Set loading to false once groups are fetched
             })
             .catch((error) => {
                 console.error('Error fetching groups:', error);
+                setLoading(false); // Set loading to false in case of an error
             });
     }, [session]);
-
-
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -65,45 +65,58 @@ const Groups = ({ onSelectGroup }: { onSelectGroup: (group: { _id: string, name:
                 </Modal>
             </div>
             <Divider />
-            <div className={styles['custom-scroll-container']} style={{ height: '90%', overflowY: 'scroll' }}>
-                {groups.map((group, index) => (
-                    <Paper key={index} elevation={0}
-                        onClick={() => {
-                            if (group)
-                                onSelectGroup(group)
-                        }}
-                        sx={{
-                            bgcolor: '#262626',
-                            color: '#fff',
-                            mx: 0.5,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            cursor: 'pointer',
-                        }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'flex-start', padding: '10px', minHeight: '70px', margin: '5px 0 5px 0' }}>
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <Image
-                                    src='/profile_pic.png' // Use the avatar property from group
-                                    alt={group?.name || ''}
-                                    width={50}
-                                    height={50}
-                                    style={{ borderRadius: '50%', margin: '0 auto' }}
-                                />
+            {loading ? (
+                <LinearProgress style={{ backgroundColor: '#007bff' }} />
+            ) : groups.length === 0 ? (
+                <div style={{ height: '80%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <Typography variant="body1" sx={{ p: 2, color: '#fff' }}>
+                        No groups to display
+                    </Typography>
+                    <Button variant="contained" color="primary" onClick={handleModalOpen} sx={{ bgcolor: '#007bff' }}>
+                        Create Group
+                    </Button>
+                </div>
+            ) : (
+                <div className={styles['custom-scroll-container']} style={{ height: '90%', overflowY: 'scroll' }}>
+                    {groups.map((group, index) => (
+                        <Paper key={index} elevation={0}
+                            onClick={() => {
+                                if (group)
+                                    onSelectGroup(group)
+                            }}
+                            sx={{
+                                bgcolor: '#262626',
+                                color: '#fff',
+                                mx: 0.5,
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                },
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'flex-start', padding: '10px', minHeight: '70px', margin: '5px 0 5px 0' }}>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Image
+                                        src='/profile_pic.png' // Use the avatar property from group
+                                        alt={group?.name || ''}
+                                        width={50}
+                                        height={50}
+                                        style={{ borderRadius: '50%', margin: '0 auto' }}
+                                    />
+                                </div>
+                                <div>
+                                    <Typography variant="body1" sx={{ ml: 2, my: 'auto' }}>
+                                        {group?.name}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ ml: 2, my: 'auto', color: '#007bff' }}>
+                                        @{group?.name}
+                                    </Typography>
+                                </div>
                             </div>
-                            <div>
-                                <Typography variant="body1" sx={{ ml: 2, my: 'auto' }}>
-                                    {group?.name}
-                                </Typography>
-                                <Typography variant="caption" sx={{ ml: 2, my: 'auto', color: '#007bff' }}>
-                                    @{group?.name}
-                                </Typography>
-                            </div>
-                        </div>
-                    </Paper>
-                ))}
-            </div>
+                        </Paper>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

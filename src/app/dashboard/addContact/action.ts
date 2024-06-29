@@ -9,7 +9,7 @@ export async function FetchProfile(session: SessionInterface) {
     try {
         const { id } = verifyToken(session);
         const profile = await getUserById({ id });
-        console.log(profile);
+        // console.log(profile);
         if (profile)
             return { profile, message: 'profile fetched successfully' };
     }
@@ -25,6 +25,7 @@ export async function GetAllProfiles(session: SessionInterface) {
         if (!id) throw new Error('Invalid token');
         const profiles = await getAllNewUsers(id);
 
+        
         profiles.map((profile) => {
             profile._id = profile._id.toString();
             profile.connections = profile?.connections?.toString().split(',') || [];
@@ -32,8 +33,9 @@ export async function GetAllProfiles(session: SessionInterface) {
             profile.pendingConnections = profile.pendingConnections?.toString().split(',') || [];
             profile.groupMemberOf = profile.groupMemberOf?.toString().split(',') || [];
         })
-
-        console.log(profiles);
+        
+        console.log('client side checking', profiles);
+        // console.log(profiles);
 
         if (profiles)
             return { profiles, message: 'profiles fetched successfully' };

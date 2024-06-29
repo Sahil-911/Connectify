@@ -15,22 +15,11 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
 
   const { session } = useAuth();
 
-  console.log(selectedContact);
-
   const [messages, setMessages] = useState<MessageInputWithId[]>([]);
   const [newMessageContent, setNewMessageContent] = useState<string>('');
-
+  const [newMessages, setNewMessages] = useState<MessageInputWithId[]>([]);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
-
-  // useEffect(() => {
-  //   GetMessagesUser1User2(session, selectedContact._id).then((response) => {
-  //     console.log(response);
-
-  //     console.log('chats fetched', response);
-  //     const fetchedMessages = response.chats;
-  //     setMessages(fetchedMessages || []);
-  //   })
-  // }, [session, selectedContact]);
+  const previousMessagesLength = useRef<number>(0);
 
   const fetchMessages = async () => {
     const response = await GetMessagesUser1User2(session, selectedContact._id);
@@ -39,16 +28,42 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
     }
   };
 
+  // Function to scroll to the bottom of the chat container
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
   useEffect(() => {
     fetchMessages(); // Initial data fetch
 
     const interval = setInterval(() => {
       fetchMessages(); // Fetch data at intervals
-    }, 5000); // Fetch every 60 seconds
+    }, 5000); // Fetch every 5 seconds
 
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, [session, selectedContact]);
 
+  useEffect(() => {
+    const isDifferent = JSON.stringify(messages) !== JSON.stringify(newMessages);
+    if (isDifferent) {
+      setMessages(newMessages); // Update messages if different
+      // Scroll to the bottom of the chat container
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    }
+  }, [newMessages]);
+
+  useEffect(() => {
+    if (messages.length !== previousMessagesLength.current) {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+      previousMessagesLength.current = messages.length;
+    }
+  }, [messages]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessageContent(event.target.value); // Update the state with the content of the input field
@@ -57,21 +72,18 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Send message using the content from the state variable
     await StoreNewMessageInContact(session, selectedContact._id, newMessageContent);
 
-    // Clear input field after sending the message
     setNewMessageContent('');
 
-    // Update messages
     GetMessagesUser1User2(session, selectedContact._id).then((response) => {
-      console.log(response);
-
-      console.log('chats fetched', response);
-      const fetchedMessages = response.chats;
-      // console.log(fetchedMessages,'ogogogo');
-      setMessages(fetchedMessages || []);
-    })
+      const fetchedMessages = response.chats || [];
+      setNewMessages(fetchedMessages); // Store new messages for comparison
+      // Scroll to the bottom of the chat container after sending a new message
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    });
   };
 
   console.log(selectedContact._id, 's');
@@ -87,7 +99,6 @@ function Chats({ selectedContact, profile }: { selectedContact: { _id: string, n
       justifyContent: 'space-between',
       width: '100%',
       height: '100%',
-
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', height: '64px' }}>
         {selectedContact.username !== '' && (<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', marginLeft: '10px' }}>

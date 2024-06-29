@@ -173,6 +173,8 @@ export const getAllNewUsers = async (userId: string) => {
             }
         });
 
+        // console.log('navaaa', newUsers)
+
         return newUsers.map((newUser) => newUser.toJSON());
     } catch (error: any) {
         throw new Error('Error fetching new users: ' + error.message);

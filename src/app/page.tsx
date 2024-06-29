@@ -6,19 +6,7 @@ import { Grid, Button, Typography, Box } from '@mui/material';
 import { Cyclone } from '@mui/icons-material';
 
 const LandingPage = () => {
-    // import { useRouter } from 'next/router';
-
-    // const LandingPage = () => {
-    // const router = useRouter();
-
-    //     // Rest of your code...
-
-    //     return (
-    //         // Your JSX code...
-    //     );
-    // };
-
-    // export default LandingPage;
+    
 
     return (
         <div style={{
